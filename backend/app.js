@@ -16,15 +16,37 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // ------------------------ Socket.io ------------------------
-const telemetryNamespace = io.of("/rockets-telemetry");
+
+// Creates a listener for weather
+const weatherTelemetryNamespace = io.of("/weather-telemetry");
+weatherTelemetryNamespace.on("connection", (socket) => {
+  console.log("Weather namespace connected:", socket.id);
+  // Sends weather data every second
+  const weatherInterval = setInterval(async () => {
+    const { data: weatherData } = await getWeatherData();
+    weatherNamespace.emit("weatherData", weatherData);
+  }, 1000);
+
+  // Clear interval on disconnection
+  socket.on("disconnect", () => {
+    console.log("Weather namespace disconnected:", socket.id);
+    clearInterval(weatherInterval); // Weather namespace'den ayrılan soketin timer'ını temizle
+  });
+});
+
+// Creates a listener for rockets
+const rocketsTelemetryNamespace = io.of("/rockets-telemetry");
 const telemetryConnections = {};
+// Receives big-endian notation, returns JSON
+const parseTelemetryData = () => {
+  // TODO
+};
 
-// Creates a listener
-telemetryNamespace.on("connection", (socket) => {
-  console.log("A rocket connected to telemetry namespace");
+rocketsTelemetryNamespace.on("connection", (socket) => {
+  console.log("Rocket telemetry namespace connected");
 
-  // Runs every 100 milisecond
-  const intervalId = setInterval(async () => {
+  // Runs every second
+  const rocketsInterval = setInterval(async () => {
     try {
       const { data: rocketsData } = await getRocketsData();
 
@@ -37,7 +59,8 @@ telemetryNamespace.on("connection", (socket) => {
           const rocketSocket = io.connect(host + ":" + port);
           // const rocketSocket = io.connect("http://" + host + ":" + port); // TRY
           rocketSocket.on("rocket-telemetry", (telemetryData) => {
-            telemetryNamespace.emit(
+            const parsedData = parseTelemetryData(telemetryData);
+            rocketsTelemetryNamespace.emit(
               `rocket-telemetry-${rocket.id}`,
               telemetryData
             );
@@ -56,7 +79,7 @@ telemetryNamespace.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A client disconnected from telemetry namespace");
     // Stop the interval
-    clearInterval(intervalId);
+    clearInterval(rocketsInterval);
     // Shut down all the telemetry connection of the rockets
     Object.values(telemetryConnections).forEach((rocketSocket) => {
       rocketSocket.disconnect();
