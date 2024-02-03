@@ -17,7 +17,7 @@ const instance = axios.create({
 async function fetchData(attemps, path) {
   try {
     // 0.4 - 2.3 seconds delayed result
-    const { data } = await instance.get(path);
+    const data = await instance.get(path);
     return data;
   } catch (error) {
     console.error(
