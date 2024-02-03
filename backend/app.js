@@ -13,13 +13,17 @@ import { Server } from "socket.io";
 
 // Create socket instances
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 // ------------------------ Socket.io ------------------------
 
 // Creates a listener for weather
-const weatherTelemetryNamespace = io.of("/weather-telemetry");
-weatherTelemetryNamespace.on("connection", (socket) => {
+const weatherNamespace = io.of("/weather-telemetry");
+weatherNamespace.on("connection", (socket) => {
   console.log("Weather namespace connected:", socket.id);
   // Sends weather data every second
   const weatherInterval = setInterval(async () => {
@@ -90,7 +94,7 @@ rocketsTelemetryNamespace.on("connection", (socket) => {
 // ------------------------ Express --------------------------
 // Starts the server
 server.listen(port, () => {
-  console.log(`Rocket Telemetry Server is up and running on port ${port}`);
+  console.log(`Rocket Server is up and running on port ${port}`);
 });
 
 // Rockets

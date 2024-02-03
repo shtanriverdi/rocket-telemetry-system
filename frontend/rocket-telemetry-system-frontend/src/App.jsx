@@ -5,8 +5,8 @@ export default function App() {
   return (
     <>
       <h1>Rocket Telemetry System</h1>
-      <Rockets />
       <Weather />
+      <Rockets />
     </>
   );
 }

@@ -1,0 +1,13 @@
+* {
+  user-select: none;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Verdana, sans-serif;
+  /* min-width: 100vw;
+  min-height: 100vh;
+  margin: 0; */
+}
