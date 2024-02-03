@@ -1,5 +1,5 @@
 // Fetch rockets data
-import { getRocketsData } from "./utils/getRocketsData.js";
+import { getRocketsData, getWeatherData } from "./utils/endpoints.js";
 
 // Represents a real time Socket.IO server
 import { Server } from "socket.io";
@@ -25,17 +25,32 @@ app.get("/", (req, res) => {
   res.send("Home Page");
 });
 
-// Rockets Data Route
+// Rockets
 app.get("/getRocketsData", async (req, res) => {
   const rocketsData = await getRocketsData();
-  console.log("rocketsData: ", rocketsData);
+  console.log("rocketsData: ", rocketsData, typeof rocketsData);
   // for (const rocket in rocketsData) {
   //   console.log(typeof rocket, rocket);
   // }
-  res.send("Getting Rockets Data...");
-  // res.send('Rocket Telemetry App...............');
+  res.json(rocketsData);
+  // res.send("Getting rockets data...");
+});
+
+// Weather
+app.get("/getWeatherData", async (req, res) => {
+  const weatherData = await getWeatherData();
+  console.log("weatherData: ", weatherData, typeof weatherData);
+  // for (const rocket in rocketsData) {
+  //   console.log(typeof rocket, rocket);
+  // }
+  res.json(weatherData);
+  // res.send("Getting weather data...");
 });
 
 app.listen(port, () => {
   console.log(`Rocket Telemetry Server is up and running on port ${port}`);
+});
+
+app.get("*", (req, res) => {
+  res.send("Route Not Found!");
 });
