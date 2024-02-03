@@ -24,7 +24,7 @@ async function fetchData(attemps, path) {
       "Error occured!",
       // error,
       "Response status:",
-      error.response.status,
+      error.response,
       "Get Request Attemps:",
       attemps
     );

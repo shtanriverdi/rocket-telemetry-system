@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-// Socket.io server address
-const socket = io("http://localhost:3000/weather-telemetry");
-
 export default function Weather() {
+  // Socket.io server address
+  const socket = io("http://localhost:3000/weather-telemetry");
+
   // Weather state
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
   const [weatherData, setWeatherData] = useState({
     temperature: 44.49625110792446,
     humidity: 0.37254237437334053,
@@ -37,6 +37,7 @@ export default function Weather() {
     socket.on("weatherData", (data) => {
       console.log("Received weather data:", data);
       setWeatherData(data);
+      handleSocketConnection(true);
     });
 
     // Listen disconnection
@@ -55,7 +56,7 @@ export default function Weather() {
   return (
     <>
       <h1>Weather Status</h1>
-      <p>Socket: {isConnected}</p>
+      <p>Socket: {isConnected.toString()}</p>
       <p>Humidity: {weatherData.humidity}</p>
       {/* <p>Precipitation: {weatherData.precipitation}</p> */}
       <p>Pressure: {weatherData.pressure}</p>
