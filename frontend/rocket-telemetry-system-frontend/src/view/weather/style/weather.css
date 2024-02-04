@@ -5,8 +5,21 @@
   align-items: start;
   border: 1px solid gray;
   border-radius: 1.5rem;
-  background-color: rgb(246, 205, 192);
+  background-color: rgb(251, 218, 150);
   padding: 1rem;
+}
+
+.status-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn {
+  width: 10rem;
+  height: 2.5rem;
+  font-size: medium;
 }
 
 .text-center {

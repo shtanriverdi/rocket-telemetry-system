@@ -70,13 +70,22 @@ export default function Weather() {
 
   return (
     <>
-      <p>Time: {formatTime(weatherData.time)}</p>
-      <p>
-        Status:{" "}
-        <span style={{ color: !isConnected ? "red" : "green" }}>
-          {!isConnected ? "Disconnected" : "Connected"}
-        </span>
-      </p>
+      <p className="text-center">Time: {formatTime(weatherData.time)}</p>
+      <div className="status-container m-b">
+        <p className="m-r">
+          Status:{" "}
+          <span style={{ color: !isConnected ? "red" : "green" }}>
+            {!isConnected ? "Disconnected" : "Connected"}
+          </span>
+        </p>
+        <button
+          className="btn"
+          onClick={() => {
+            handleSocketConnection(!isConnected);
+          }}>
+          {!isConnected ? "Run System" : "Stop System"}
+        </button>
+      </div>
       <h3 className="text-center">Weather Forecast</h3>
       <main className="weather-container m-b">
         <div>
@@ -101,13 +110,6 @@ export default function Weather() {
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
         </div>
       </main>
-      <button
-      className="btn"
-        onClick={() => {
-          handleSocketConnection(!isConnected);
-        }}>
-        {!isConnected ? "Run System" : "Stop System"}
-      </button>
     </>
   );
 }
