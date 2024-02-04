@@ -32,16 +32,22 @@ export default function Weather() {
   };
 
   useEffect(() => {
-    socket.on("weatherData", (data) => {
-      console.log("");
-      setWeatherData(data);
-      setIsConnected(true);
-    });
+    const runFethingData = async () => {
+      socket.on("weatherData", (data) => {
+        setWeatherData(data);
+        setIsConnected(true);
+      });
 
-    return () => {
-      setIsConnected(false);
-      socket.disconnect();
+      // Triggers re-rendering
+      setWeatherData((prevData) => ({ ...prevData }));
+
+      return () => {
+        setIsConnected(false);
+        socket.disconnect();
+      };
     };
+
+    runFethingData();
   }, []);
 
   return (
