@@ -5,7 +5,7 @@ export default function App() {
   return (
     <>
       <h1>Rocket Telemetry System</h1>
-      <small>v 0.1</small>
+      <small>version 0.1</small>
       <Weather />
       {/* <Rockets /> */}
     </>

@@ -6,8 +6,10 @@ import { io } from "socket.io-client";
 const socket = io("http://localhost:3000/weather");
 
 export default function Weather() {
+  // Socket connection state
+  const [isConnected, setIsConnected] = useState("Disconnected");
+
   // Weather state
-  const [isConnected, setIsConnected] = useState(false);
   const [weatherData, setWeatherData] = useState({
     temperature: 0,
     humidity: 0,
@@ -19,7 +21,7 @@ export default function Weather() {
       sleet: false,
       hail: false,
     },
-    time: "2024",
+    time: "*",
     wind: {
       direction: "*",
       angle: 0,
@@ -35,14 +37,14 @@ export default function Weather() {
     const runFethingData = async () => {
       socket.on("weatherData", (data) => {
         setWeatherData(data);
-        setIsConnected(true);
+        setIsConnected("Connected");
       });
 
       // Triggers re-rendering
       setWeatherData((prevData) => ({ ...prevData }));
 
       return () => {
-        setIsConnected(false);
+        setIsConnected("Disconnected");
         socket.disconnect();
       };
     };
@@ -53,22 +55,22 @@ export default function Weather() {
   return (
     <>
       <h1>Weather Status</h1>
-      <p>Socket: {isConnected.toString()}</p>
+      <p>Socket: {isConnected}</p>
+      <p>Temperature: {weatherData.temperature} °C</p>
       <p>Humidity: {weatherData.humidity}</p>
-      <p>probability: {weatherData.precipitation.probability}</p>
-      <p>rain: {weatherData.precipitation.rain}</p>
-      <p>snow: {weatherData.precipitation.snow}</p>
-      <p>sleet: {weatherData.precipitation.sleet}</p>
-      <p>hail: {weatherData.precipitation.hail}</p>
       <p>Pressure: {weatherData.pressure}</p>
-      <p>Temperature: {weatherData.temperature}</p>
       <p>Time: {weatherData.time}</p>
+      <p>probability: {weatherData.precipitation.probability}</p>
+      <p>rain: {weatherData.precipitation.rain.toString()}</p>
+      <p>snow: {weatherData.precipitation.snow.toString()}</p>
+      <p>sleet: {weatherData.precipitation.sleet.toString()}</p>
+      <p>hail: {weatherData.precipitation.hail.toString()}</p>
       <p>Wind: {weatherData.wind.direction}</p>
       <p>direction: {weatherData.wind.angle}</p>
       <p>speed: {weatherData.wind.speed}</p>
       <button
         onClick={() => {
-          handleSocketConnection(true);
+          handleSocketConnection("Connected");
         }}>
         Run System
       </button>

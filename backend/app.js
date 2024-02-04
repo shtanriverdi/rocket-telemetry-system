@@ -34,7 +34,7 @@ setInterval(async () => {
   // console.log("Weather data: ", weatherData);
   await enqueueWeatherData(weatherData);
   // await printAllData();
-}, 1000);
+}, 100);
 
 // ------------------------ Socket.io ------------------------
 
@@ -51,7 +51,7 @@ weatherNamespace.on("connection", (socket) => {
     weatherNamespace.emit("weatherData", redisWeatherJSON);
     // const { data: weatherData } = await getWeatherData();
     // weatherNamespace.emit("weatherData", weatherData);
-  }, 1000);
+  }, 2300);
 
   // Clear interval on disconnection
   socket.on("disconnect", () => {
