@@ -9,6 +9,9 @@ const redis = new Redis();
 // Queue lenght limit
 const MAX_QUEUE_LENGTH = 10;
 
+// Last processed data, cached data
+const lastRecentWeatherData = {};
+
 // Weather data queue
 const weatherQueueName = "weatherQueue";
 
@@ -19,7 +22,7 @@ const printAllData = async () => {
       console.error("Error getting items from the queue:", err);
     } else {
       console.log("Items in the queue: ");
-      items.forEach(item => {
+      items.forEach((item) => {
         // const jsonItem = JSON.parse(item);
         // console.log(jsonItem);
         console.log(item);
@@ -38,7 +41,11 @@ const enqueueWeatherData = async (data) => {
       const poppedData = await redis.lpop(weatherQueueName);
       console.log("poppedData: ", poppedData);
     }
-    await redis.rpush(weatherQueueName, JSON.stringify(data));
+    const stringifiedData = JSON.stringify(data);
+    await redis.rpush(weatherQueueName, stringifiedData);
+    // Update last recent data
+    lastRecentWeatherData = stringifiedData;
+    console.log("Added data into the queue: ", data);
   } catch (error) {
     console.log("error enqueue: ", error);
   }
@@ -48,7 +55,8 @@ const enqueueWeatherData = async (data) => {
 const dequeueWeatherData = async () => {
   try {
     const data = await redis.lpop(weatherQueueName);
-    return data ? JSON.parse(data) : "-empty-";
+    console.log("Removed data from queue: ", data);
+    return data ? JSON.parse(data) : lastRecentWeatherData;
   } catch (error) {
     console.log("error dequeue: ", error);
   }
