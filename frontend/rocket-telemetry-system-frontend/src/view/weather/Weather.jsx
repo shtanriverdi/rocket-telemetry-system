@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
+import { formatTime } from "../../utils/formatTime";
+import "./style/weather.css";
 
 // Socket.io server address, autoconnect is off
 const socket = io("http://localhost:3000/weather", {
@@ -18,14 +20,14 @@ export default function Weather() {
     pressure: 0,
     precipitation: {
       probability: 0,
-      rain: false,
-      snow: false,
-      sleet: false,
-      hail: false,
+      rain: 0,
+      snow: 0,
+      sleet: 0,
+      hail: 0,
     },
-    time: "*",
+    time: "0000-00-00T00:00:0.016020",
     wind: {
-      direction: "*",
+      direction: 0,
       angle: 0,
       speed: 0,
     },
@@ -68,26 +70,39 @@ export default function Weather() {
 
   return (
     <>
-      <h1>Weather Status</h1>
+      <p>Time: {formatTime(weatherData.time)}</p>
       <p>
-        Socket:{" "}
+        Status:{" "}
         <span style={{ color: !isConnected ? "red" : "green" }}>
           {!isConnected ? "Disconnected" : "Connected"}
         </span>
       </p>
-      <p>Temperature: {weatherData.temperature.toFixed(2)} °C</p>
-      <p>Humidity: {weatherData.humidity.toFixed(2)}</p>
-      <p>Pressure: {weatherData.pressure.toFixed(2)}</p>
-      <p>Time: {weatherData.time}</p>
-      <p>probability: {weatherData.precipitation.probability.toFixed(2)}</p>
-      <p>rain: {weatherData.precipitation.rain.toString()}</p>
-      <p>snow: {weatherData.precipitation.snow.toString()}</p>
-      <p>sleet: {weatherData.precipitation.sleet.toString()}</p>
-      <p>hail: {weatherData.precipitation.hail.toString()}</p>
-      <p>Direction: {weatherData.wind.direction}</p>
-      <p>Angle: {weatherData.wind.angle.toFixed(2)}</p>
-      <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
+      <h3 className="text-center">Weather Forecast</h3>
+      <main className="weather-container m-b">
+        <div>
+          <p>Temperature: {weatherData.temperature.toFixed(2)} °C</p>
+          <p>Humidity: {weatherData.humidity.toFixed(2)}</p>
+          <p>Pressure: {weatherData.pressure.toFixed(2)}</p>
+        </div>
+
+        <div className="p-x">
+          <p>Precipitation</p>
+          <p>probability: {weatherData.precipitation.probability.toFixed(2)}</p>
+          <p>rain: {weatherData.precipitation.rain.toString()}</p>
+          <p>snow: {weatherData.precipitation.snow.toString()}</p>
+          <p>sleet: {weatherData.precipitation.sleet.toString()}</p>
+          <p>hail: {weatherData.precipitation.hail.toString()}</p>
+        </div>
+
+        <div>
+          <p>Wind</p>
+          <p>Direction: {weatherData.wind.direction}</p>
+          <p>Angle: {weatherData.wind.angle.toFixed(2)}</p>
+          <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
+        </div>
+      </main>
       <button
+      className="btn"
         onClick={() => {
           handleSocketConnection(!isConnected);
         }}>
