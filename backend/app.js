@@ -15,26 +15,26 @@ import { Server } from "socket.io";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // TODO
+    origin: 'http://localhost:3000', // TODO
   },
 });
 
 // ------------------------ Socket.io ------------------------
 
 // Creates a listener for weather
-const weatherNamespace = io.of("/weather-telemetry");
+const weatherNamespace = io.of("/weather");
 weatherNamespace.on("connection", (socket) => {
   console.log("Weather namespace connected:", socket.id);
   // Sends weather data every second
   const weatherInterval = setInterval(async () => {
     const { data: weatherData } = await getWeatherData();
     weatherNamespace.emit("weatherData", weatherData);
-  }, 1000);
+  }, 2300);
 
   // Clear interval on disconnection
   socket.on("disconnect", () => {
     console.log("Weather namespace disconnected:", socket.id);
-    clearInterval(weatherInterval); // Weather namespace'den ayrılan soketin timer'ını temizle
+    clearInterval(weatherInterval);
   });
 });
 

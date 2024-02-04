@@ -22,9 +22,7 @@ async function fetchData(attemps, path) {
   } catch (error) {
     console.error(
       "Error occured!",
-      // error,
-      "Response status:",
-      error.response,
+      error.request.cause,
       "Get Request Attemps:",
       attemps
     );
