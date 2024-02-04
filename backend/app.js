@@ -15,28 +15,36 @@ import { Server } from "socket.io";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // TODO
+    origin: "http://localhost:3000", // TODO
   },
 });
+
+// Import redis functions
+import { enqueueWeatherData, dequeueWeatherData } from "./redis/redisQueue.js";
+
+// // ------------------------ Redis ------------------------
+// setInterval(() => {
+//   console.log("Redis...");
+// }, 2000);
 
 // ------------------------ Socket.io ------------------------
 
 // Creates a listener for weather
-const weatherNamespace = io.of("/weather");
-weatherNamespace.on("connection", (socket) => {
-  console.log("Weather namespace connected:", socket.id);
-  // Sends weather data every second
-  const weatherInterval = setInterval(async () => {
-    const { data: weatherData } = await getWeatherData();
-    weatherNamespace.emit("weatherData", weatherData);
-  }, 2300);
+// const weatherNamespace = io.of("/weather");
+// weatherNamespace.on("connection", (socket) => {
+//   console.log("Weather namespace connected:", socket.id);
+//   // Sends weather data every second
+//   const weatherInterval = setInterval(async () => {
+//     const { data: weatherData } = await getWeatherData();
+//     weatherNamespace.emit("weatherData", weatherData);
+//   }, 2300);
 
-  // Clear interval on disconnection
-  socket.on("disconnect", () => {
-    console.log("Weather namespace disconnected:", socket.id);
-    clearInterval(weatherInterval);
-  });
-});
+//   // Clear interval on disconnection
+//   socket.on("disconnect", () => {
+//     console.log("Weather namespace disconnected:", socket.id);
+//     clearInterval(weatherInterval);
+//   });
+// });
 
 // Creates a listener for rockets
 const rocketsTelemetryNamespace = io.of("/rockets-telemetry");
@@ -108,11 +116,11 @@ server.listen(port, () => {
 // });
 
 // Weather
-app.get("/getWeatherData", async (req, res) => {
-  const { data: weatherData } = await getWeatherData();
-  console.log("Weather data: ", weatherData);
-  res.json(weatherData);
-});
+// app.get("/getWeatherData", async (req, res) => {
+//   const { data: weatherData } = await getWeatherData();
+//   console.log("Weather data: ", weatherData);
+//   res.json(weatherData);
+// });
 
 app.get("*", (req, res) => {
   res.send("Route Not Found!");
