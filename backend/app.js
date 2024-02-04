@@ -28,19 +28,20 @@ import {
 } from "./redis/redisWeatherQueue.js";
 
 // ------------------------ Redis ------------------------
-const stopWeatherSocket = () => {
-  weatherNamespace.on("terminate", function () {
-    weatherNamespace.disconnectSockets();
-  });
-};
+// const stopWeatherSocket = () => {
+//   weatherNamespace.on("terminate", function () {
+//     weatherNamespace.disconnectSockets();
+//   });
+// };
 
+// Data storing frequency on redis
 setInterval(async () => {
   console.log("Redis enqueueing...");
   const { data: weatherData } = await getWeatherData();
   // console.log("Weather data: ", weatherData);
   await enqueueWeatherData(weatherData);
   // await printAllData();
-}, 1000);
+}, 100);
 
 // ------------------------ Socket.io ------------------------
 
@@ -49,7 +50,7 @@ const weatherNamespace = io.of("/weather");
 weatherNamespace.on("connection", (socket) => {
   console.log("Weather namespace connected:", socket.id);
 
-  // Sends weather data every 2.3 second
+  // Sends weather data every 2 second
   const weatherInterval = setInterval(async () => {
     // Pull the data from Redis
     const redisWeatherJSON = await dequeueWeatherData();
@@ -57,7 +58,7 @@ weatherNamespace.on("connection", (socket) => {
     weatherNamespace.emit("weatherData", redisWeatherJSON);
     // const { data: weatherData } = await getWeatherData();
     // weatherNamespace.emit("weatherData", weatherData);
-  }, 2300);
+  }, 150);
 
   // Clear interval on disconnection
   socket.on("disconnect", () => {
@@ -136,10 +137,10 @@ server.listen(port, () => {
 // });
 
 // Weather
-app.get("/runWeatherSocket", (req, res) => {
-  stopWeatherSocket();
-  next();
-});
+// app.get("/runWeatherSocket", (req, res) => {
+//   stopWeatherSocket();
+//   next();
+// });
 
 // app.get("/getWeatherData", async (req, res) => {
 //   const { data: weatherData } = await getWeatherData();
