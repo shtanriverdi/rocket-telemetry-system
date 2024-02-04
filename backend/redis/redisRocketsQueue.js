@@ -9,25 +9,25 @@ const redis = new Redis();
 // Queue lenght limit
 const MAX_QUEUE_LENGTH = 100;
 
-// Weather data queue
-const weatherQueueName = "weatherQueue";
+// Rockets data queue
+const rocketsQueueName = "rocketsTelemetryQueue";
 
-// Appends data into the weather queue
+// Appends data into the rockets queue
 // Time Comp: O(1)
-const enqueueWeatherData = async (data) => {
-  const currentQueueLen = await redis.llen(weatherQueueName);
+const enqueueRocketsData = async (data) => {
+  const currentQueueLen = await redis.llen(rocketsQueueName);
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen === MAX_QUEUE_LENGTH) {
-    const poppedData = await redis.lpop(weatherQueueName);
+    const poppedData = await redis.lpop(rocketsQueueName);
     console.log("poppedData: ", poppedData);
   }
-  await redis.rpush(weatherQueueName, JSON.stringify(data));
+  await redis.rpush(rocketsQueueName, JSON.stringify(data));
 };
 
 // Removes and gets the first data in the weather queue
-const dequeueWeatherData = async () => {
-  const data = await redis.lpop(weatherQueueName);
+const dequeueRocketsData = async () => {
+  const data = await redis.lpop(rocketsQueueName);
   return data ? JSON.parse(data) : "empty";
 };
 
-export { enqueueWeatherData, dequeueWeatherData };
+export { enqueueRocketsData, dequeueRocketsData };

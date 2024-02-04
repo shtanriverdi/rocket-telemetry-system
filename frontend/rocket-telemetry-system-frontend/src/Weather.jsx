@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-// Socket.io server address
-const socket = io("http://localhost:3000/weather-telemetry", {
-  autoConnect: false,
-});
+// Socket.io server address, autoconnect is on
+const socket = io("http://localhost:3000/weather");
 
 export default function Weather() {
   // Weather state
@@ -33,34 +31,18 @@ export default function Weather() {
     setIsConnected(isConnected);
   };
 
-  // Handles connect/disconnect to server socket
   useEffect(() => {
-    // no-op if the socket is already connected
-    socket.connect();
+    socket.on("weatherData", (data) => {
+      console.log("");
+      setWeatherData(data);
+      setIsConnected(true);
+    });
 
-    // Close the socket on unmount of component
-    // To prevent duplicate event registrations
     return () => {
+      setIsConnected(false);
       socket.disconnect();
     };
-  }, []); // Empty dependency array to run only once
-
-  // Listens to weather data and connection events
-  useEffect(() => {
-    // Listen for weather data
-    socket.on("weatherData", (data) => {
-      console.log("Socket connected");
-      console.log("Received weather data:", data);
-      setWeatherData(data);
-      handleSocketConnection(true); // Update connection status
-    });
-
-    // Listen for disconnection
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-      handleSocketConnection(false); // Update connection status
-    });
-  }, [socket]); // Run when socket changes
+  }, []);
 
   return (
     <>

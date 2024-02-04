@@ -15,44 +15,58 @@ import { Server } from "socket.io";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // TODO
+    origin: "*",
   },
 });
 
 // Import redis functions
-import { enqueueWeatherData, dequeueWeatherData } from "./redis/redisQueue.js";
+import {
+  redis,
+  enqueueWeatherData,
+  dequeueWeatherData,
+  printAllData,
+} from "./redis/redisWeatherQueue.js";
 
 // // ------------------------ Redis ------------------------
-// setInterval(() => {
-//   console.log("Redis...");
-// }, 2000);
+setInterval(async () => {
+  console.log("Redis queing...");
+  const { data: weatherData } = await getWeatherData();
+  // console.log("Weather data: ", weatherData);
+  await enqueueWeatherData(weatherData);
+  // await printAllData();
+}, 2300);
 
 // ------------------------ Socket.io ------------------------
 
 // Creates a listener for weather
-// const weatherNamespace = io.of("/weather");
-// weatherNamespace.on("connection", (socket) => {
-//   console.log("Weather namespace connected:", socket.id);
-//   // Sends weather data every second
-//   const weatherInterval = setInterval(async () => {
-//     const { data: weatherData } = await getWeatherData();
-//     weatherNamespace.emit("weatherData", weatherData);
-//   }, 2300);
+const weatherNamespace = io.of("/weather");
+weatherNamespace.on("connection", (socket) => {
+  console.log("Weather namespace connected:", socket.id);
 
-//   // Clear interval on disconnection
-//   socket.on("disconnect", () => {
-//     console.log("Weather namespace disconnected:", socket.id);
-//     clearInterval(weatherInterval);
-//   });
-// });
+  // Sends weather data every 2.3 second
+  const weatherInterval = setInterval(async () => {
+    // Pull the data from Redis
+    const redisWeatherJSON = await dequeueWeatherData();
+    // Send the data to socket
+    weatherNamespace.emit("weatherData", redisWeatherJSON);
+    // const { data: weatherData } = await getWeatherData();
+    // weatherNamespace.emit("weatherData", weatherData);
+  }, 2300);
+
+  // Clear interval on disconnection
+  socket.on("disconnect", () => {
+    console.log("Weather namespace disconnected:", socket.id);
+    clearInterval(weatherInterval);
+  });
+});
 
 // Creates a listener for rockets
-const rocketsTelemetryNamespace = io.of("/rockets-telemetry");
-const telemetryConnections = {};
-// Receives big-endian notation, returns JSON
-const parseTelemetryData = () => {
-  // TODO
-};
+// const rocketsTelemetryNamespace = io.of("/rockets-telemetry");
+// const telemetryConnections = {};
+// // Receives big-endian notation, returns JSON
+// const parseTelemetryData = () => {
+//   // TODO
+// };
 
 // rocketsTelemetryNamespace.on("connection", (socket) => {
 //   console.log("Rocket telemetry namespace connected");
