@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-// Socket.io server address, autoconnect is on
-const socket = io("http://localhost:3000/weather");
+// Socket.io server address, autoconnect is off
+const socket = io("http://localhost:3000/weather", {
+  autoConnect: false,
+});
 
 export default function Weather() {
   // Socket connection state
-  const [isConnected, setIsConnected] = useState("Disconnected");
+  const [isConnected, setIsConnected] = useState(false);
 
   // Weather state
   const [weatherData, setWeatherData] = useState({
@@ -30,10 +32,22 @@ export default function Weather() {
   });
 
   const handleSocketConnection = (isConnected) => {
-    setIsConnected(isConnected);
+    // Connect to socket
+    if (isConnected === true) {
+      socket.connect();
+      setIsConnected(true);
+    }
+    // Disconnect socket
+    else {
+      setIsConnected(false);
+      socket.disconnect();
+    }
   };
 
   useEffect(() => {
+    // no-op if the socket is already connected
+    // socket.connect();
+
     const runFethingData = async () => {
       socket.on("weatherData", (data) => {
         setWeatherData(data);
@@ -44,35 +58,40 @@ export default function Weather() {
       setWeatherData((prevData) => ({ ...prevData }));
 
       return () => {
-        setIsConnected("Disconnected");
+        setIsConnected(false);
         socket.disconnect();
       };
     };
 
     runFethingData();
-  }, []);
+  }, [isConnected]);
 
   return (
     <>
       <h1>Weather Status</h1>
-      <p>Socket: {isConnected}</p>
-      <p>Temperature: {weatherData.temperature} °C</p>
-      <p>Humidity: {weatherData.humidity}</p>
-      <p>Pressure: {weatherData.pressure}</p>
+      <p>
+        Socket:{" "}
+        <span style={{ color: !isConnected ? "red" : "green" }}>
+          {!isConnected ? "Disconnected" : "Connected"}
+        </span>
+      </p>
+      <p>Temperature: {weatherData.temperature.toFixed(2)} °C</p>
+      <p>Humidity: {weatherData.humidity.toFixed(2)}</p>
+      <p>Pressure: {weatherData.pressure.toFixed(2)}</p>
       <p>Time: {weatherData.time}</p>
-      <p>probability: {weatherData.precipitation.probability}</p>
+      <p>probability: {weatherData.precipitation.probability.toFixed(2)}</p>
       <p>rain: {weatherData.precipitation.rain.toString()}</p>
       <p>snow: {weatherData.precipitation.snow.toString()}</p>
       <p>sleet: {weatherData.precipitation.sleet.toString()}</p>
       <p>hail: {weatherData.precipitation.hail.toString()}</p>
-      <p>Wind: {weatherData.wind.direction}</p>
-      <p>direction: {weatherData.wind.angle}</p>
-      <p>speed: {weatherData.wind.speed}</p>
+      <p>Direction: {weatherData.wind.direction}</p>
+      <p>Angle: {weatherData.wind.angle.toFixed(2)}</p>
+      <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
       <button
         onClick={() => {
-          handleSocketConnection("Connected");
+          handleSocketConnection(!isConnected);
         }}>
-        Run System
+        {!isConnected ? "Run System" : "Stop System"}
       </button>
     </>
   );

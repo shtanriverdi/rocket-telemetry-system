@@ -11,7 +11,7 @@ const redis = new Redis({
 });
 
 // Queue length limit
-const MAX_QUEUE_LENGTH = 20;
+const MAX_QUEUE_LENGTH = 30;
 
 // Last processed data, cached data
 let lastRecentWeatherData = {};
@@ -41,6 +41,7 @@ const enqueueWeatherData = async (data) => {
   try {
     const currentQueueLen = await redis.llen(weatherQueueName);
     // Keep the length of the queue constant to prevent memory overflow. etc
+    console.error("current Queue Length: ", currentQueueLen);
     if (currentQueueLen >= MAX_QUEUE_LENGTH) {
       const poppedData = await redis.lpop(weatherQueueName);
       console.log("poppedData: ", poppedData, " MAX_QUEUE_LENGTH: ", MAX_QUEUE_LENGTH);
