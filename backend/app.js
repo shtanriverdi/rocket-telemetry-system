@@ -15,7 +15,7 @@ import { Server } from "socket.io";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*", // TODO
   },
 });
 
@@ -34,7 +34,7 @@ setInterval(async () => {
   // console.log("Weather data: ", weatherData);
   await enqueueWeatherData(weatherData);
   // await printAllData();
-}, 2300);
+}, 1000);
 
 // ------------------------ Socket.io ------------------------
 
@@ -51,7 +51,7 @@ weatherNamespace.on("connection", (socket) => {
     weatherNamespace.emit("weatherData", redisWeatherJSON);
     // const { data: weatherData } = await getWeatherData();
     // weatherNamespace.emit("weatherData", weatherData);
-  }, 2300);
+  }, 1000);
 
   // Clear interval on disconnection
   socket.on("disconnect", () => {
