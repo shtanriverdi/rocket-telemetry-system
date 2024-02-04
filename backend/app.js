@@ -28,6 +28,12 @@ import {
 } from "./redis/redisWeatherQueue.js";
 
 // ------------------------ Redis ------------------------
+const stopWeatherSocket = () => {
+  weatherNamespace.on("terminate", function () {
+    weatherNamespace.disconnectSockets();
+  });
+};
+
 setInterval(async () => {
   console.log("Redis enqueueing...");
   const { data: weatherData } = await getWeatherData();
@@ -130,6 +136,11 @@ server.listen(port, () => {
 // });
 
 // Weather
+app.get("/runWeatherSocket", (req, res) => {
+  stopWeatherSocket();
+  next();
+});
+
 // app.get("/getWeatherData", async (req, res) => {
 //   const { data: weatherData } = await getWeatherData();
 //   console.log("Weather data: ", weatherData);
