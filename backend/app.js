@@ -27,14 +27,14 @@ import {
   printAllData,
 } from "./redis/redisWeatherQueue.js";
 
-// // ------------------------ Redis ------------------------
+// ------------------------ Redis ------------------------
 setInterval(async () => {
-  console.log("Redis queing...");
+  console.log("Redis enqueueing...");
   const { data: weatherData } = await getWeatherData();
   // console.log("Weather data: ", weatherData);
   await enqueueWeatherData(weatherData);
   // await printAllData();
-}, 100);
+}, 1000);
 
 // ------------------------ Socket.io ------------------------
 

@@ -4,13 +4,17 @@
   We use redis for this purpose due to its performance and in memory mechanism
 */
 import Redis from "ioredis";
-const redis = new Redis();
+const redis = new Redis({
+  lazyConnect: true,
+  connectTimeout: 5000,
+  maxRetriesPerRequest: 3,
+});
 
-// Queue lenght limit
-const MAX_QUEUE_LENGTH = 10;
+// Queue length limit
+const MAX_QUEUE_LENGTH = 20;
 
 // Last processed data, cached data
-const lastRecentWeatherData = {};
+let lastRecentWeatherData = {};
 
 // Weather data queue
 const weatherQueueName = "weatherQueue";
@@ -39,15 +43,17 @@ const enqueueWeatherData = async (data) => {
     // Keep the length of the queue constant to prevent memory overflow. etc
     if (currentQueueLen >= MAX_QUEUE_LENGTH) {
       const poppedData = await redis.lpop(weatherQueueName);
-      console.log("poppedData: ", poppedData);
+      console.log("poppedData: ", poppedData, " MAX_QUEUE_LENGTH: ", MAX_QUEUE_LENGTH);
     }
     const stringifiedData = JSON.stringify(data);
     await redis.rpush(weatherQueueName, stringifiedData);
     // Update last recent data
-    lastRecentWeatherData = stringifiedData;
-    console.log("Added data into the queue: ", data);
+    lastRecentWeatherData = { ...data }; // Deep copy
+    // console.log("lastRecentWeatherData", lastRecentWeatherData);
+    // console.log("Added data into the queue: ", data);
+    console.log("Added data into the queue.\n");
   } catch (error) {
-    console.log("error enqueue: ", error);
+    console.log("error enqueue: ", error, "\n");
   }
 };
 
@@ -55,10 +61,12 @@ const enqueueWeatherData = async (data) => {
 const dequeueWeatherData = async () => {
   try {
     const data = await redis.lpop(weatherQueueName);
-    console.log("Removed data from queue: ", data);
+    // console.log("Removed data from queue: ", data);
+    console.log("Removed data from queue", data);
+    console.log("lastRecentWeatherData", lastRecentWeatherData, "\n");
     return data ? JSON.parse(data) : lastRecentWeatherData;
   } catch (error) {
-    console.log("error dequeue: ", error);
+    console.log("error dequeue: ", error, "\n");
   }
 };
 
