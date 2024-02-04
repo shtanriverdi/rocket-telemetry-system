@@ -22,7 +22,7 @@ async function fetchData(attemps, path) {
   } catch (error) {
     console.error(
       "Error occured!",
-      error.request.cause,
+      error.request,
       "Get Request Attemps:",
       attemps
     );
@@ -33,12 +33,12 @@ async function fetchData(attemps, path) {
 
 // This function will keep trying to fetch until it gets the data
 async function attemptGettingData(path) {
-  let data = false;
+  // let data = false;
   let attemps = 1;
-  while (data === false) {
-    data = await fetchData(attemps, path);
-    attemps += 1;
-  }
+  // while (data === false) {
+    const data = await fetchData(attemps, path);
+    // attemps += 1;
+  // }
   return data;
 }
 

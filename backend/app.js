@@ -46,50 +46,50 @@ const parseTelemetryData = () => {
   // TODO
 };
 
-rocketsTelemetryNamespace.on("connection", (socket) => {
-  console.log("Rocket telemetry namespace connected");
+// rocketsTelemetryNamespace.on("connection", (socket) => {
+//   console.log("Rocket telemetry namespace connected");
 
-  // Runs every second
-  const rocketsInterval = setInterval(async () => {
-    try {
-      const { data: rocketsData } = await getRocketsData();
+//   // Runs every second
+//   const rocketsInterval = setInterval(async () => {
+//     try {
+//       const { data: rocketsData } = await getRocketsData();
 
-      // Create TCP Telemetry connection for each rocket
-      rocketsData.forEach((rocket) => {
-        // If the connection is not created before
-        if (!telemetryConnections[rocket.id]) {
-          // Craete new telemetry connection
-          const { host, port } = rocket.telemetry;
-          const rocketSocket = io.connect(host + ":" + port);
-          // const rocketSocket = io.connect("http://" + host + ":" + port); // TRY
-          rocketSocket.on("rocket-telemetry", (telemetryData) => {
-            const parsedData = parseTelemetryData(telemetryData);
-            rocketsTelemetryNamespace.emit(
-              `rocket-telemetry-${rocket.id}`,
-              telemetryData
-            );
-          });
+//       // Create TCP Telemetry connection for each rocket
+//       rocketsData.forEach((rocket) => {
+//         // If the connection is not created before
+//         if (!telemetryConnections[rocket.id]) {
+//           // Craete new telemetry connection
+//           const { host, port } = rocket.telemetry;
+//           const rocketSocket = io.connect(host + ":" + port);
+//           // const rocketSocket = io.connect("http://" + host + ":" + port); // TRY
+//           rocketSocket.on("rocket-telemetry", (telemetryData) => {
+//             const parsedData = parseTelemetryData(telemetryData);
+//             rocketsTelemetryNamespace.emit(
+//               `rocket-telemetry-${rocket.id}`,
+//               telemetryData
+//             );
+//           });
 
-          // Store the socket with rocket id
-          telemetryConnections[rocket.id] = rocketSocket;
-        }
-      });
-    } catch (error) {
-      console.log("Error fetching rocket telemetry data: ", error.message);
-    }
-  }, 1000);
+//           // Store the socket with rocket id
+//           telemetryConnections[rocket.id] = rocketSocket;
+//         }
+//       });
+//     } catch (error) {
+//       console.log("Error fetching rocket telemetry data: ", error.message);
+//     }
+//   }, 1000);
 
-  // Clear the interval when disconnected
-  socket.on("disconnect", () => {
-    console.log("A client disconnected from telemetry namespace");
-    // Stop the interval
-    clearInterval(rocketsInterval);
-    // Shut down all the telemetry connection of the rockets
-    Object.values(telemetryConnections).forEach((rocketSocket) => {
-      rocketSocket.disconnect();
-    });
-  });
-});
+//   // Clear the interval when disconnected
+//   socket.on("disconnect", () => {
+//     console.log("A client disconnected from telemetry namespace");
+//     // Stop the interval
+//     clearInterval(rocketsInterval);
+//     // Shut down all the telemetry connection of the rockets
+//     Object.values(telemetryConnections).forEach((rocketSocket) => {
+//       rocketSocket.disconnect();
+//     });
+//   });
+// });
 
 // ------------------------ Express --------------------------
 // Starts the server
@@ -98,14 +98,14 @@ server.listen(port, () => {
 });
 
 // Rockets
-app.get("/getRocketsData", async (req, res) => {
-  const { data: rocketsData } = await getRocketsData();
-  console.log("Rockets data: ");
-  for (const rocket of rocketsData) {
-    console.log(rocket);
-  }
-  res.json(rocketsData);
-});
+// app.get("/getRocketsData", async (req, res) => {
+//   const { data: rocketsData } = await getRocketsData();
+//   console.log("Rockets data: ");
+//   for (const rocket of rocketsData) {
+//     console.log(rocket);
+//   }
+//   res.json(rocketsData);
+// });
 
 // Weather
 app.get("/getWeatherData", async (req, res) => {

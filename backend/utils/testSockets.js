@@ -29,7 +29,7 @@ console.log("weatherSocket testing");
 // no-op if the socket is already connected
 weatherSocket.connect();
 
-weatherSocket.disconnect();
+// weatherSocket.disconnect();
 
 weatherSocket.on("weatherData", (data) => {
   console.log("weatherSocket connected");
@@ -37,4 +37,6 @@ weatherSocket.on("weatherData", (data) => {
 });
 
 // Listen for disconnection
-weatherSocket.on("weatherSocket disconnect", () => {});
+weatherSocket.on("disconnect", () => {
+  console.log("weatherSocket disconnected");
+});
