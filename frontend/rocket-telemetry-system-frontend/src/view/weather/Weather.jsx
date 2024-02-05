@@ -4,14 +4,16 @@ import { io } from "socket.io-client";
 import { formatTime } from "../../utils/formatTime";
 import "./style/weather.css";
 
+const WEATHER_URL = "http://localhost:3000/weather";
+
 // Socket.io server address, autoconnect is off
-const socket = io("http://localhost:3000/weather", {
+const socket = io(WEATHER_URL, {
   autoConnect: false,
 });
 
 export default function Weather() {
-  // Socket connection state
-  const [isConnected, setIsConnected] = useState(false);
+  // Socket connection has 3 states: { 0: disconnected, 1: connecting..., 2: connected }
+  const [isConnected, setIsConnected] = useState(0);
 
   // Weather state
   const [weatherData, setWeatherData] = useState({
@@ -33,35 +35,44 @@ export default function Weather() {
     },
   });
 
-  const handleSocketConnection = (isConnected) => {
-    // Connect to socket
-    if (isConnected === true) {
-      socket.connect();
-      setIsConnected(true);
+  const handleWeatherSocketConnection = async () => {
+    // Connect weather socket
+    if (isConnected === 0) {
+      // Loading state
+      setIsConnected(1);
+      // Send conection signal to the server
+      try {
+        const { response } = await fetch(WEATHER_URL + "/on");
+        if (response === "connected") {
+          socket.connect();
+          setIsConnected(2);
+          return;
+        }
+      } catch (error) {
+        console.log("error: ", error);
+        // Otherwise, get back to initial state
+        setIsConnected(0);
+      }
     }
-    // Disconnect socket
-    else {
-      setIsConnected(false);
+    // Close the donnection
+    else if (isConnected === 2) {
+      await fetch(WEATHER_URL + "/off");
       socket.disconnect();
       socket.off("weatherData");
+      setIsConnected(0);
     }
   };
 
   useEffect(() => {
-    // no-op if the socket is already connected
-    // socket.connect();
-
     const runFethingData = async () => {
       socket.on("weatherData", (data) => {
         setWeatherData(data);
-        setIsConnected("Connected");
       });
 
-      // Triggers re-rendering
-      setWeatherData((prevData) => ({ ...prevData }));
+      // // Triggers re-rendering
+      // setWeatherData((prevData) => ({ ...prevData }));
 
       return () => {
-        setIsConnected(false);
         socket.disconnect();
         socket.off("weatherData");
       };
@@ -73,22 +84,34 @@ export default function Weather() {
   return (
     <>
       <p className="text-center">Time: {formatTime(weatherData.time)}</p>
+      <hr />
+      <h2 className="text-center ">Weather Forecast</h2>
       <div className="status-container m-b">
-        <p className="m-r">
+        <p className="m-x">
           Status:{" "}
-          <span style={{ color: !isConnected ? "red" : "green" }}>
-            {!isConnected ? "Disconnected" : "Connected"}
+          <span
+            style={{
+              color:
+                isConnected === 0
+                  ? "red"
+                  : isConnected === 1
+                  ? "gray"
+                  : "green",
+            }}>
+            {isConnected === 0 && "Disconnected"}
+            {isConnected === 1 && "Loading..."}
+            {isConnected === 2 && "Connected"}
           </span>
         </p>
         <button
+          disabled={isConnected === 1}
           className="btn"
           onClick={() => {
-            handleSocketConnection(!isConnected);
+            handleWeatherSocketConnection();
           }}>
-          {!isConnected ? "Run System" : "Stop System"}
+          {isConnected === 0 ? "Run Weather Data" : "Stop Weather Data"}
         </button>
       </div>
-      <h3 className="text-center">Weather Forecast</h3>
       <main className="weather-container m-b">
         <div>
           <p>
@@ -118,12 +141,13 @@ export default function Weather() {
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
         </div>
       </main>
+      <hr />
       <button
         className="btn"
         onClick={() => {
-          handleSocketConnection(false);
+          handleWeatherSocketConnection();
         }}>
-        Stop System
+        Stop Entire System
       </button>
     </>
   );

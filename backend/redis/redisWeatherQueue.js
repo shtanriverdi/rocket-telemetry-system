@@ -44,12 +44,17 @@ const enqueueWeatherData = async (data) => {
     console.error("current Queue Length: ", currentQueueLen);
     if (currentQueueLen >= MAX_QUEUE_LENGTH) {
       const poppedData = await redis.lpop(weatherQueueName);
-      console.log("poppedData: ", poppedData, " MAX_QUEUE_LENGTH: ", MAX_QUEUE_LENGTH);
+      console.log(
+        "poppedData: ",
+        poppedData,
+        " MAX_QUEUE_LENGTH: ",
+        MAX_QUEUE_LENGTH
+      );
     }
     const stringifiedData = JSON.stringify(data);
     await redis.rpush(weatherQueueName, stringifiedData);
-    // Update last recent data
-    lastRecentWeatherData = { ...data }; // Deep copy
+    // Update last recent data, deep copy
+    lastRecentWeatherData = { ...data };
     // console.log("lastRecentWeatherData", lastRecentWeatherData);
     // console.log("Added data into the queue: ", data);
     console.log("Added data into the queue.\n");
@@ -62,6 +67,8 @@ const enqueueWeatherData = async (data) => {
 const dequeueWeatherData = async () => {
   try {
     const data = await redis.lpop(weatherQueueName);
+    // // Update last recent data, deep copy
+    // lastRecentWeatherData = { ...data };
     // console.log("Removed data from queue: ", data);
     console.log("Removed data from queue", data);
     console.log("lastRecentWeatherData", lastRecentWeatherData, "\n");

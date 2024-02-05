@@ -27,23 +27,50 @@ import {
   printAllData,
 } from "./redis/redisWeatherQueue.js";
 
-// ------------------------ Redis ------------------------
-// const stopWeatherSocket = () => {
-//   weatherNamespace.on("terminate", function () {
-//     weatherNamespace.disconnectSockets();
-//   });
-// };
+// Fix cors error, add middleware
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
+// ------------------------ Redis - Weather ------------------------
+// To clear the interval later
+let weatherRedisInterval;
+
+const stopWeatherSocket = () => {
+  weatherNamespace.on("terminate", function () {
+    weatherNamespace.disconnectSockets();
+    console.log("Weather namespace disconnected:", socket.id);
+    clearInterval(weatherInterval);
+  });
+};
+
+// Gets the weather data and pushes to the redis queue
 // Data storing frequency on redis
-setInterval(async () => {
-  console.log("Redis enqueueing...");
-  const { data: weatherData } = await getWeatherData();
-  // console.log("Weather data: ", weatherData);
-  await enqueueWeatherData(weatherData);
-  // await printAllData();
-}, 100);
+const runWeatherSocket = () => {
+  weatherRedisInterval = setInterval(async () => {
+    console.log("Redis enqueueing...");
+    const { data: weatherData } = await getWeatherData();
+    // console.log("Weather data: ", weatherData);
+    await enqueueWeatherData(weatherData);
+    // await printAllData();
+  }, 100);
+};
 
-// ------------------------ Socket.io ------------------------
+// Weather middlewares { status: "on" | "off" }
+app.get("/weather/:status", (req, res, next) => {
+  const status = req.params.status;
+  let response = "empty";
+  console.log("status:", status);
+  if (status === "on") {
+    runWeatherSocket();
+    response = "connected";
+  } else if (status === "off") {
+    stopWeatherSocket();
+    response = "disconnected";
+  }
+  res.json({ response });
+});
 
 // Creates a listener for weather
 const weatherNamespace = io.of("/weather");
