@@ -42,8 +42,9 @@ export default function Weather() {
       setIsConnected(1);
       // Send conection signal to the server
       try {
-        const { response } = await fetch(WEATHER_URL + "/on");
-        if (response === "connected") {
+        const response = await fetch(WEATHER_URL + "/on");
+        const { response: data } = await response.json();
+        if (data === "connected") {
           socket.connect();
           setIsConnected(2);
           return;
@@ -56,7 +57,9 @@ export default function Weather() {
     }
     // Close the donnection
     else if (isConnected === 2) {
-      await fetch(WEATHER_URL + "/off");
+      const response = await fetch(WEATHER_URL + "/off");
+      const { response: data } = await response.json();
+      console.log("data on close", data);
       socket.disconnect();
       socket.off("weatherData");
       setIsConnected(0);
@@ -145,9 +148,9 @@ export default function Weather() {
       <button
         className="btn"
         onClick={() => {
-          handleWeatherSocketConnection();
+          window.location.reload();
         }}>
-        Stop Entire System
+        Reset Entire System
       </button>
     </>
   );

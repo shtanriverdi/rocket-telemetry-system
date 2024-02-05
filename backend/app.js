@@ -34,31 +34,8 @@ app.use((req, res, next) => {
 });
 
 // ------------------------ Redis - Weather ------------------------
-// To clear the interval later
-let weatherRedisInterval;
-
-const stopWeatherSocket = () => {
-  weatherNamespace.on("terminate", function () {
-    weatherNamespace.disconnectSockets();
-    console.log("Weather namespace disconnected:", socket.id);
-    clearInterval(weatherInterval);
-  });
-};
-
-// Gets the weather data and pushes to the redis queue
-// Data storing frequency on redis
-const runWeatherSocket = () => {
-  weatherRedisInterval = setInterval(async () => {
-    console.log("Redis enqueueing...");
-    const { data: weatherData } = await getWeatherData();
-    // console.log("Weather data: ", weatherData);
-    await enqueueWeatherData(weatherData);
-    // await printAllData();
-  }, 100);
-};
-
 // Weather middlewares { status: "on" | "off" }
-app.get("/weather/:status", (req, res, next) => {
+app.get("/weather/:status", (req, res) => {
   const status = req.params.status;
   let response = "empty";
   console.log("status:", status);
@@ -69,11 +46,33 @@ app.get("/weather/:status", (req, res, next) => {
     stopWeatherSocket();
     response = "disconnected";
   }
+  // Set the response in the JSON object
   res.json({ response });
 });
 
+function stopWeatherSocket() {
+  const weatherRedisInterval = app.get("weatherRedisInterval");
+  console.log("weatherRedisInterval", weatherRedisInterval);
+  clearInterval(weatherRedisInterval);
+}
+
+// Gets the weather data and pushes to the redis queue
+// Data storing frequency on redis
+function runWeatherSocket() {
+  const weatherRedisInterval = setInterval(async () => {
+    console.log("Redis enqueueing...");
+    const { data: weatherData } = await getWeatherData();
+    // console.log("Weather data: ", weatherData);
+    await enqueueWeatherData(weatherData);
+    // await printAllData();
+  }, 100);
+  app.set("weatherRedisInterval", weatherRedisInterval);
+  console.log("weatherRedisInterval:", app.get("weatherRedisInterval"));
+}
+
 // Creates a listener for weather
 const weatherNamespace = io.of("/weather");
+
 weatherNamespace.on("connection", (socket) => {
   console.log("Weather namespace connected:", socket.id);
 
@@ -92,6 +91,12 @@ weatherNamespace.on("connection", (socket) => {
     console.log("Weather namespace disconnected:", socket.id);
     clearInterval(weatherInterval);
   });
+});
+
+weatherNamespace.on("terminate", function () {
+  weatherNamespace.removeAllListeners("terminate");
+  weatherNamespace.disconnectSockets();
+  console.log("Weather namespace disconnected:", socket.id);
 });
 
 // Creates a listener for rockets
