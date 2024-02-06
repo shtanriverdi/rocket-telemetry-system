@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { formatTime } from "../../utils/formatTime";
+import WeatherIcon from "./WeatherIcon";
 
 const WEATHER_URL = "http://localhost:3000/weather";
 
@@ -90,7 +91,10 @@ export default function Weather() {
 
   return (
     <>
-      <h1 className="text-center m-t">Weather Forecast</h1>
+      <div className="flex-container">
+        <WeatherIcon />
+        <h1 className="text-center m-t">&nbsp;Weather Forecast</h1>
+      </div>
       <div className="status-container m-b m">
         <div>
           <p className="m-x">
@@ -129,13 +133,7 @@ export default function Weather() {
       </div>
       <main className="weather-container m-b">
         <div>
-          <p>
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415" />
-              <path d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1" />
-            </svg>
-            Temperature: {weatherData.temperature.toFixed(2)} °C
-          </p>
+          <p>Temperature: {weatherData.temperature.toFixed(2)} °C</p>
           <p>Humidity: {weatherData.humidity.toFixed(2)}</p>
           <p>Pressure: {weatherData.pressure.toFixed(2)}</p>
         </div>
@@ -149,7 +147,7 @@ export default function Weather() {
           <p>Hail: {weatherData.precipitation.hail.toString()}</p>
         </div>
 
-        <div>
+        <div style={{ width: "7rem" }}>
           <p className="bold underline">Wind</p>
           <p>Direction: {weatherData.wind.direction}</p>
           <p>Angle: {weatherData.wind.angle.toFixed(2)}</p>

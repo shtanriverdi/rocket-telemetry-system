@@ -15,8 +15,8 @@ export default function Rockets() {
   return (
     <>
       <div className="flex-container m">
-        <h1>Rockets&nbsp;</h1>
         <RocketIcon />
+        <h1>&nbsp;Rockets</h1>
       </div>
       <div className="grid-list m m-bxxl">{rocketsListItems}</div>
     </>
