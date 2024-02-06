@@ -6,7 +6,7 @@ export default function App() {
   return (
     <>
       <div className="flex-container">
-        <h2>Rocket Telemetry System</h2>
+        <h1>Rocket Telemetry System</h1>
         <small>&nbsp; version 0.1</small>
       </div>
       <Weather />

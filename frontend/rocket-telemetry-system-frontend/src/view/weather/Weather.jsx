@@ -74,9 +74,15 @@ export default function Weather() {
       // // Triggers re-rendering
       // setWeatherData((prevData) => ({ ...prevData }));
 
+      socket.on('disconnect'), () => {
+        console.log('Connection error!');
+        setIsConnected(0);
+      }
+
       return () => {
         socket.disconnect();
         socket.off("weatherData");
+        setIsConnected(0);
       };
     };
 
@@ -85,32 +91,41 @@ export default function Weather() {
 
   return (
     <>
-      <p className="text-center">{formatTime(weatherData.time)}</p>
-      <h2 className="text-center ">Weather Forecast</h2>
-      <div className="status-container m-b">
-        <p className="m-x">
-          Status:{" "}
-          <span
-            style={{
-              color:
-                isConnected === 0
-                  ? "red"
-                  : isConnected === 1
-                  ? "gray"
-                  : "green",
-            }}>
-            {isConnected === 0 && "Disconnected"}
-            {isConnected === 1 && "Loading..."}
-            {isConnected === 2 && "Connected"}
-          </span>
-        </p>
+      <h1 className="text-center m-t">Weather Forecast</h1>
+      <div className="status-container m-b m">
+        <div>
+          <p className="m-x">
+            Status:{" "}
+            <span
+              style={{
+                color:
+                  isConnected === 0
+                    ? "red"
+                    : isConnected === 1
+                    ? "gray"
+                    : "green",
+              }}>
+              {isConnected === 0 && "Disconnected"}
+              {isConnected === 1 && "Loading..."}
+              {isConnected === 2 && "Connected"}
+            </span>
+          </p>
+          <p className="text-center">{formatTime(weatherData.time)}</p>
+        </div>
         <button
           disabled={isConnected === 1}
-          className="btn"
+          className="btn m"
           onClick={() => {
             handleWeatherSocketConnection();
           }}>
           {isConnected === 0 ? "Run Weather Data" : "Stop Weather Data"}
+        </button>
+        <button
+          className="btn"
+          onClick={() => {
+            window.location.reload();
+          }}>
+          Reset System
         </button>
       </div>
       <main className="weather-container m-b">
@@ -142,13 +157,6 @@ export default function Weather() {
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
         </div>
       </main>
-      <button
-        className="btn"
-        onClick={() => {
-          window.location.reload();
-        }}>
-        Reset System
-      </button>
     </>
   );
 }

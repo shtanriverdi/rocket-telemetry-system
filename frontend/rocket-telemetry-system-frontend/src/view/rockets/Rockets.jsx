@@ -2,6 +2,7 @@
 import rocketsData from "./rocketsData";
 import Rocket from "./Rocket";
 import { useState } from "react";
+import RocketIcon from "./RocketIcon";
 
 export default function Rockets() {
   // All rockets state
@@ -13,7 +14,10 @@ export default function Rockets() {
 
   return (
     <>
-      <h1>Rockets</h1>
+      <div className="flex-container m">
+        <h1>Rockets&nbsp;</h1>
+        <RocketIcon />
+      </div>
       <div className="grid-list m m-bxxl">{rocketsListItems}</div>
     </>
   );
