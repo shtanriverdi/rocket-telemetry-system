@@ -71,13 +71,12 @@ export default function Weather() {
         setWeatherData(data);
       });
 
-      // // Triggers re-rendering
-      // setWeatherData((prevData) => ({ ...prevData }));
-
-      socket.on('disconnect'), () => {
-        console.log('Connection error!');
+      socket.on("disconnect", () => {
+        console.log("Disconnected!");
+        socket.disconnect();
+        socket.off("weatherData");
         setIsConnected(0);
-      }
+      });
 
       return () => {
         socket.disconnect();

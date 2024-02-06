@@ -52,7 +52,7 @@ app.get("/weather/:status", (req, res) => {
 
 function stopWeatherSocket() {
   const weatherRedisInterval = app.get("weatherRedisInterval");
-  console.log("weatherRedisInterval", weatherRedisInterval);
+  // console.log("weatherRedisInterval", weatherRedisInterval);
   clearInterval(weatherRedisInterval);
 }
 
