@@ -14,7 +14,7 @@ export default function Rockets() {
   return (
     <>
       <h1>Rockets</h1>
-      {rocketsListItems}
+      <div className="grid-list m m-bxxl">{rocketsListItems}</div>
     </>
   );
 }

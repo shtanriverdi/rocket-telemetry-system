@@ -7,39 +7,51 @@ export default function Rocket({ rocketData }) {
   const { altitude, speed, acceleration, thrust, temperature } = rocketData;
 
   return (
-    <div className="flex-container flex-col">
+    <div className="rocket-container p">
       <div>
-        <h4>Rocket id: {id}</h4>
+        <p className="text-center">
+          <b>Rocket:</b> {id}
+        </p>
         <span className="bold">Payload:</span>
-        <p>Weight: {payload.weight}</p>
-        <p>Description: {payload.description}</p>
+        <p>
+          <b>Description:</b> {payload.description}
+        </p>
+        <p>
+          <b>Weight:</b> {payload.weight}
+        </p>
+        <div className="no-bullet">
+          <li>
+            <b>Model:</b> {model}
+          </li>
+          <li>
+            <b>Mass:</b> {mass}
+          </li>
+        </div>
       </div>
 
-      <div className="rocket-container m-b">
-        <div>
-          <li>Model: {model}</li>
-          <li>Mass: {mass}</li>
-        </div>
-
+      <div className="flex-container no-bullet">
         <div className="p-x">
-          <li>Status: {status}</li>
-          <li className="bold">Timestamps:</li>
-          <li>launched: {timestamps.launched ?? "-"}</li>
-          <li>deployed: {timestamps.deployed ?? "-"}</li>
-          <li>failed: {timestamps.failed ?? "-"}</li>
-          <li>cancelled: {timestamps.cancelled ?? "-"}</li>
-        </div>
-
-        <div>
-          <li className="bold">Telemetry Data:</li>
+          <li className="bold">Telemetry Data</li>
           <li>Altitude: {altitude}</li>
           <li>Speed: {speed}</li>
           <li>Acceleration: {acceleration}</li>
           <li>Thrust: {thrust}</li>
           <li>Temperature: {temperature}</li>
-          <li>{host + ":" + port}</li>
+        </div>
+        <div>
+          <li className="bold">Timestamps</li>
+          <li>launched: {timestamps.launched ?? "-"}</li>
+          <li>deployed: {timestamps.deployed ?? "-"}</li>
+          <li>failed: {timestamps.failed ?? "-"}</li>
+          <li>cancelled: {timestamps.cancelled ?? "-"}</li>
         </div>
       </div>
+      <p className="m-t">
+        <b>Status:</b> {status}
+        <li className="no-bullet">
+          <b>Host/Port:</b> {host + ":" + port}
+        </li>
+      </p>
     </div>
   );
 }
