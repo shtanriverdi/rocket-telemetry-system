@@ -32,10 +32,11 @@ async function fetchData(attemps, path) {
 }
 
 // This function will keep trying to fetch until it gets the data
+// Stops after 300 attempts
 async function attemptGettingData(path) {
   let data = false;
   let attemps = 1;
-  while (data === false) {
+  while (data === false && attemps <= 300) {
     data = await fetchData(attemps, path);
     attemps += 1;
   }

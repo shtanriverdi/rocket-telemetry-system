@@ -1,4 +1,4 @@
-// import Rockets from "./Rockets";
+import Rockets from "./view/rockets/Rockets";
 import Weather from "./view/weather/Weather";
 import "./app.css"
 
@@ -10,7 +10,7 @@ export default function App() {
         <small>&nbsp; version 0.1</small>
       </div>
       <Weather />
-      {/* <Rockets /> */}
+      <Rockets />
     </>
   );
 }

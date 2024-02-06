@@ -16,6 +16,14 @@
   align-items: center;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
 .btn {
   width: 10rem;
   height: 2.5rem;

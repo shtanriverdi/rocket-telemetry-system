@@ -57,9 +57,9 @@ export default function Weather() {
     }
     // Close the donnection
     else if (isConnected === 2) {
-      const response = await fetch(WEATHER_URL + "/off");
-      const { response: data } = await response.json();
-      console.log("data on close", data);
+      await fetch(WEATHER_URL + "/off");
+      // const response = await fetch(WEATHER_URL + "/off");
+      // const { response: data } = await response.json();
       socket.disconnect();
       socket.off("weatherData");
       setIsConnected(0);
@@ -86,7 +86,7 @@ export default function Weather() {
 
   return (
     <>
-      <p className="text-center">Time: {formatTime(weatherData.time)}</p>
+      <p className="text-center">{formatTime(weatherData.time)}</p>
       <hr />
       <h2 className="text-center ">Weather Forecast</h2>
       <div className="status-container m-b">
@@ -129,7 +129,7 @@ export default function Weather() {
         </div>
 
         <div className="p-x">
-          <p>Precipitation</p>
+          <p className="bold underline">Precipitation</p>
           <p>Probability: {weatherData.precipitation.probability.toFixed(2)}</p>
           <p>Rain: {weatherData.precipitation.rain.toString()}</p>
           <p>Snow: {weatherData.precipitation.snow.toString()}</p>
@@ -138,7 +138,7 @@ export default function Weather() {
         </div>
 
         <div>
-          <p>Wind</p>
+          <p className="bold underline">Wind</p>
           <p>Direction: {weatherData.wind.direction}</p>
           <p>Angle: {weatherData.wind.angle.toFixed(2)}</p>
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
@@ -150,7 +150,7 @@ export default function Weather() {
         onClick={() => {
           window.location.reload();
         }}>
-        Reset Entire System
+        Reset System
       </button>
     </>
   );
