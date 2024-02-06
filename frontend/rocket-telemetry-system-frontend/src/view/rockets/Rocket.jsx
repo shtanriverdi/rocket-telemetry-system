@@ -1,31 +1,5 @@
 export default function Rocket({ rocketData }) {
-  const dataa = {
-    id: "DSSvW7VLmb",
-    model: "Saturn V",
-    mass: 2970000,
-    payload: {
-      description: "Apollo CSM-109 Odyssey, Apollo LM-7 Aquarius, 3 Astronauts",
-      weight: 1542,
-    },
-    telemetry: {
-      host: "0.0.0.0",
-      port: 4000,
-    },
-    status: "waiting",
-    timestamps: {
-      launched: null,
-      deployed: null,
-      failed: null,
-      cancelled: null,
-    },
-    // Telemetry data
-    altitude: 0.0,
-    speed: 0.0,
-    acceleration: 0.0,
-    thrust: 35100000,
-    temperature: 0.0,
-  };
-  // Telemtry
+  // Telemetry
   const { host, port } = rocketData.telemetry;
   // RestAPI Data
   const { id, model, mass, payload, status, timestamps } = rocketData;
@@ -33,8 +7,39 @@ export default function Rocket({ rocketData }) {
   const { altitude, speed, acceleration, thrust, temperature } = rocketData;
 
   return (
-    <>
-      <h1>Rocket 1</h1>
-    </>
+    <div className="flex-container flex-col">
+      <div>
+        <h4>Rocket id: {id}</h4>
+        <span className="bold">Payload:</span>
+        <p>Weight: {payload.weight}</p>
+        <p>Description: {payload.description}</p>
+      </div>
+
+      <div className="rocket-container m-b">
+        <div>
+          <li>Model: {model}</li>
+          <li>Mass: {mass}</li>
+        </div>
+
+        <div className="p-x">
+          <li>Status: {status}</li>
+          <li className="bold">Timestamps:</li>
+          <li>launched: {timestamps.launched ?? "-"}</li>
+          <li>deployed: {timestamps.deployed ?? "-"}</li>
+          <li>failed: {timestamps.failed ?? "-"}</li>
+          <li>cancelled: {timestamps.cancelled ?? "-"}</li>
+        </div>
+
+        <div>
+          <li className="bold">Telemetry Data:</li>
+          <li>Altitude: {altitude}</li>
+          <li>Speed: {speed}</li>
+          <li>Acceleration: {acceleration}</li>
+          <li>Thrust: {thrust}</li>
+          <li>Temperature: {temperature}</li>
+          <li>{host + ":" + port}</li>
+        </div>
+      </div>
+    </div>
   );
 }

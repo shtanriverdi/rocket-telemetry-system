@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { formatTime } from "../../utils/formatTime";
-import "./style/weather.css";
 
 const WEATHER_URL = "http://localhost:3000/weather";
 
@@ -87,7 +86,6 @@ export default function Weather() {
   return (
     <>
       <p className="text-center">{formatTime(weatherData.time)}</p>
-      <hr />
       <h2 className="text-center ">Weather Forecast</h2>
       <div className="status-container m-b">
         <p className="m-x">
@@ -144,7 +142,6 @@ export default function Weather() {
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
         </div>
       </main>
-      <hr />
       <button
         className="btn"
         onClick={() => {

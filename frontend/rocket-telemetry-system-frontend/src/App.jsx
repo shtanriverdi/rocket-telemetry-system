@@ -1,6 +1,6 @@
 import Rockets from "./view/rockets/Rockets";
 import Weather from "./view/weather/Weather";
-import "./app.css"
+import "./app.css";
 
 export default function App() {
   return (
