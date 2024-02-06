@@ -5,6 +5,11 @@
   align-items: baseline;
 }
 
+.outer-container {
+  display: flex;
+  align-items: center;
+}
+
 .flex-col {
   flex-direction: column;
 }

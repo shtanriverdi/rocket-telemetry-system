@@ -90,7 +90,7 @@ export default function Weather() {
   }, [isConnected]);
 
   return (
-    <div className="m">
+    <div className="outer-container flex-col m">
       <div className="flex-container">
         <WeatherIcon />
         <h1 className="text-center m-t">&nbsp;Weather Forecast</h1>
@@ -131,7 +131,7 @@ export default function Weather() {
           Reset System
         </button>
       </div>
-      <main className="weather-container m-b">
+      <main className="weather-container">
         <div>
           <p>Temperature: {weatherData.temperature.toFixed(2)} °C</p>
           <p>Humidity: {weatherData.humidity.toFixed(2)}</p>
