@@ -40,6 +40,9 @@ async function attemptGettingData(path) {
     data = await fetchData(attemps, path);
     attemps += 1;
   }
+  if (attemps > 300 && data === false) {
+    console.log("Cannot fetch data!");
+  }
   return data;
 }
 

@@ -1,7 +1,13 @@
 import { getRocketsData, getWeatherData } from "./utils/endpoints.js";
+// This could have been done via get request
+// For the sake of simplicity, I wanted to use this way
+import rockets from "./utils/rocketsHostInfo.js";
 
 // Initialize Express Backend
 import express from "express";
+
+// For TCP connection
+import net from "net";
 
 // Express Application for routes, this is not a server!
 const port = 3000;
@@ -33,7 +39,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// ------------------------ Redis - Weather ------------------------
+// ------------------------ Weather ------------------------
+
 // Weather middlewares { status: "on" | "off" }
 app.get("/weather/:status", (req, res) => {
   const status = req.params.status;
@@ -97,6 +104,84 @@ weatherNamespace.on("terminate", function () {
   weatherNamespace.removeAllListeners("terminate");
   weatherNamespace.disconnectSockets();
   console.log("Weather namespace disconnected:", socket.id);
+});
+
+// ------------------------ Rockets ------------------------
+
+// Creates namespace for each rocket
+console.log("Rockets:");
+// rockets.forEach((rocket) => {
+// const { id, host, port } = rocket;
+// console.log(id, host, port);
+// const rocketNamespace = io.of(`/rocket-${id}`);
+
+// rocketNamespace.on("connection", (socket) => {
+//   console.log(`Connected to telemetry of rocket ${id} at ${host}:${port}`);
+
+//   socket.on("telemetry", (data) => {
+//     console.log(`Telemetry data from rocket ${id}:`, data);
+//   });
+// });
+
+// const telemetrySocket = io(`http://${host}:${port}`);
+// telemetrySocket.on("connect", () => {
+//   console.log(`Connected to telemetry of rocket ${id}`);
+// });
+// });
+
+// Create a TCP connection for each rocket
+rockets.forEach((rocket) => {
+  // Creates new TCP Socket
+  const socket = new net.Socket();
+
+  const { id, host, port } = rocket;
+
+  // Establish the connection
+  socket.connect(port, host, () => {
+    console.log(`TCP bağlantısı kuruldu: ${id}`);
+  });
+
+  // When data is received
+  socket.on("data", (data) => {
+    // Send data to each specific rocket room
+    io.to(id).emit("rocketData", data.toString());
+  });
+
+  socket.on("close", () => {
+    console.log(`TCP connection ended for rocket: ${id}`);
+  });
+
+  // Error
+  socket.on("error", (err) => {
+    console.error(`Hata oluştu: ${err.message}`);
+  });
+
+  // Create a socket.io room for each rocket
+  io.on("connection", (socket) => {
+    console.log(`Socket.io connected for rocket: ${id}`);
+    socket.join(id);
+  });
+});
+
+function runRocketSocket(rocketId) {}
+
+function stopRocketSocket(rocketId) {}
+
+// Rockets middlewares { status: "on" | "off" }
+app.get("/rockets/:rocketId/:status", (req, res) => {
+  const rocketId = req.params.rocketId;
+  const status = req.params.status;
+  let response = "empty";
+  console.log("rocketId:", rocketId, " status:", status);
+  if (status === "on") {
+    runRocketSocket(rocketId);
+    response = "connected";
+  } else if (status === "off") {
+    stopRocketSocket(rocketId);
+    response = "disconnected";
+  }
+  // Set the response in the JSON object
+  res.json({ response });
 });
 
 // Creates a listener for rockets
