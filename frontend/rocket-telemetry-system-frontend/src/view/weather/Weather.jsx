@@ -90,7 +90,7 @@ export default function Weather() {
   }, [isConnected]);
 
   return (
-    <>
+    <div className="m">
       <div className="flex-container">
         <WeatherIcon />
         <h1 className="text-center m-t">&nbsp;Weather Forecast</h1>
@@ -154,6 +154,6 @@ export default function Weather() {
           <p>Speed: {weatherData.wind.speed.toFixed(2)}</p>
         </div>
       </main>
-    </>
+    </div>
   );
 }

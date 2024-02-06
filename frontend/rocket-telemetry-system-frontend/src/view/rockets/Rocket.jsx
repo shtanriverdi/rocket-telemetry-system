@@ -8,13 +8,12 @@ export default function Rocket({ rocketData }) {
 
   return (
     <div className="rocket-container p">
-      <div>
-        <p className="text-center">
+      <div className="m-b">
+        <p className="text-center m-bs">
           <b>Rocket:</b> {id}
         </p>
-        <span className="bold">Payload:</span>
         <p>
-          <b>Description:</b> {payload.description}
+          <b>Payload:</b> {payload.description}
         </p>
         <p>
           <b>Weight:</b> {payload.weight}
@@ -29,9 +28,9 @@ export default function Rocket({ rocketData }) {
         </div>
       </div>
 
-      <div className="flex-container no-bullet">
-        <div className="p-x">
-          <li className="bold">Telemetry Data</li>
+      <div className="tele-container no-bullet">
+        <div>
+          <li className="bold m-r">Telemetry Data</li>
           <li>Altitude: {altitude}</li>
           <li>Speed: {speed}</li>
           <li>Acceleration: {acceleration}</li>
