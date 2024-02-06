@@ -9,6 +9,10 @@
   flex-direction: column;
 }
 
+.space-between {
+  justify-content: space-between;
+}
+
 .no-bullet {
   list-style-type: none;
 }

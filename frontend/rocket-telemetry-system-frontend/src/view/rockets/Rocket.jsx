@@ -45,12 +45,16 @@ export default function Rocket({ rocketData }) {
           <li>cancelled: {timestamps.cancelled ?? "-"}</li>
         </div>
       </div>
-      <p className="m-t">
+      <p className="m-t m-b">
         <b>Status:</b> {status}
         <li className="no-bullet">
           <b>Host/Port:</b> {host + ":" + port}
         </li>
       </p>
+      <div className="flex-container">
+        <button className="m-r">Launch</button>
+        <button>Cancel</button>
+      </div>
     </div>
   );
 }
