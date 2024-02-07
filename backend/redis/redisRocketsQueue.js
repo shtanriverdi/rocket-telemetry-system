@@ -182,7 +182,7 @@ const enqueueRocketData = async (data, rocketID) => {
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen >= MAX_QUEUE_LENGTH) {
     const poppedData = await redis.lpop(rocketsQueueMap[rocketID]);
-    console.log("poppedData: ", poppedData, currentQueueLen);
+    // console.log("poppedData: ", poppedData, currentQueueLen);
   }
   // Push only if data is valid, we need at least 10 data entries
   const isValid = await isDataValid(data, rocketID);

@@ -57,6 +57,13 @@ export default function Rocket({ rocketData }) {
       setRocketConnected(2);
     });
 
+    socket.on("disconnect", () => {
+      console.log("On disconnect for Rocket: ", id);
+      socket.off("rocketData");
+      socket.disconnect();
+      setRocketConnected(0);
+    });
+
     socket.on("rocketData", (data) => {
       console.log(`Roket data received (${id}):`, data);
       setTelemetryState(data);
@@ -71,7 +78,7 @@ export default function Rocket({ rocketData }) {
       socket.off("rocketData");
       setRocketConnected(0);
     });
-  }, [id, isRocketConnected, socket]);
+  }, [isRocketConnected]);
 
   return (
     <div className="rocket-container p">

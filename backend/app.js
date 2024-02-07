@@ -111,11 +111,11 @@ weatherNamespace.on("connection", (socket) => {
   });
 });
 
-weatherNamespace.on("terminate", function () {
-  weatherNamespace.removeAllListeners("terminate");
-  weatherNamespace.disconnectSockets();
-  console.log("Weather namespace disconnected:", socket.id);
-});
+// weatherNamespace.on("terminate", function () {
+//   weatherNamespace.removeAllListeners("terminate");
+//   weatherNamespace.disconnectSockets();
+//   console.log("Weather namespace disconnected:", socket.id);
+// });
 
 // ------------------------ Rockets ------------------------
 
