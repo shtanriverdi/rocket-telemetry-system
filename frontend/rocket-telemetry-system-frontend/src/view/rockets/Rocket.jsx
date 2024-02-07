@@ -62,7 +62,7 @@ export default function Rocket({ rocketData }) {
     });
 
     socket.on("rocketData", (data) => {
-      console.log(`Roket data received (${id}):`, data);
+      // console.log(`Roket data received (${id}):`, data);
       setTelemetryState(data);
     });
 
@@ -79,33 +79,36 @@ export default function Rocket({ rocketData }) {
   return (
     <div className="rocket-container p">
       <div className="m-b">
-        <p className="text-center m-bs">
+        <p className="text-center m-b">
           <b>Rocket: </b>
           {id}&nbsp;&nbsp;
-          <button
-            disabled={isRocketConnected === 1}
-            onClick={handleSocketConnection}>
-            {isRocketConnected === 0 && "Connect"}
-            {isRocketConnected === 1 && "Connecting"}
-            {isRocketConnected === 2 && "Disconnect"}
-          </button>
-          <small>
-            <b>Connection: </b>
-          </small>
-          <small
-            style={{
-              color:
-                isRocketConnected === 0
-                  ? "red"
-                  : isRocketConnected === 1
-                  ? "gray"
-                  : "green",
-            }}>
-            {isRocketConnected === 0 && "Disconnected"}
-            {isRocketConnected === 1 && "Connecting..."}
-            {isRocketConnected === 2 && "Connected"}
-          </small>
         </p>
+        <div className="m-b">
+          <p>
+            <b>Connection: </b>
+            <p
+              className="inline-block"
+              style={{
+                color:
+                  isRocketConnected === 0
+                    ? "red"
+                    : isRocketConnected === 1
+                    ? "gray"
+                    : "green",
+              }}>
+              {isRocketConnected === 0 && "Disconnected"}
+              {isRocketConnected === 1 && "Connecting..."}
+              {isRocketConnected === 2 && "Connected"}&nbsp;
+              <button
+                disabled={isRocketConnected === 1}
+                onClick={handleSocketConnection}>
+                {isRocketConnected === 0 && "Connect"}
+                {isRocketConnected === 1 && "Connecting"}
+                {isRocketConnected === 2 && "Disconnect"}
+              </button>
+            </p>
+          </p>
+        </div>
         <p>
           <b>Payload:</b> {payload.description}
         </p>
@@ -123,16 +126,16 @@ export default function Rocket({ rocketData }) {
       </div>
 
       <div className="tele-container no-bullet">
-        <div>
-          <li className="bold m-r">Telemetry Data</li>
-          <li>Altitude: {altitude}</li>
-          <li>Speed: {speed}</li>
-          <li>Acceleration: {acceleration}</li>
-          <li>Thrust: {thrust}</li>
-          <li>Temperature: {temperature}</li>
+        <div className="m-b">
+          <li className="bold underline m-r">Telemetry Data</li>
+          <li>Altitude: {telemetryState.altitude}</li>
+          <li>Speed: {telemetryState.speed}</li>
+          <li>Acceleration: {telemetryState.acceleration}</li>
+          <li>Thrust: {telemetryState.thrust}</li>
+          <li>Temperature: {telemetryState.temperature}</li>
         </div>
         <div>
-          <li className="bold">Timestamps</li>
+          <li className="bold underline">Timestamps</li>
           <li>launched: {timestamps.launched ?? "-"}</li>
           <li>deployed: {timestamps.deployed ?? "-"}</li>
           <li>failed: {timestamps.failed ?? "-"}</li>
