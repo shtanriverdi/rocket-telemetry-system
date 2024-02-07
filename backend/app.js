@@ -144,6 +144,7 @@ rockets.forEach((rocket) => {
 
     // Save data to redis queue of specific rocket
     enqueueRocketData(rocketTelemetryData, rocketID);
+    printAllRocketData(rocketID);
 
     // Emit rocketData to the specific rocket room
     // io.to(rocketID).emit("rocketData", rocketTelemetryData);

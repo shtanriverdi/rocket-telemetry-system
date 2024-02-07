@@ -80,7 +80,7 @@ const isValidFloat = (
     if (standardDeviations.hasOwnProperty(key)) {
       const difference = Math.abs(value - averages[key]);
       if (difference > threshold * standardDeviations[key]) {
-        console.log(`Invalid data for ${key}: ${value}`);
+        // console.log(`Invalid data for ${key}: ${value}`);
         return false;
       }
     }
@@ -176,17 +176,17 @@ const isDataValid = async (dataToBePushed, rocketID) => {
 // Accepts first 10 data anyway for checking purposes
 // Time Comp: O(1)
 const enqueueRocketData = async (data, rocketID) => {
-  console.log("rocketsQueueMap: ", rocketsQueueMap);
+  // console.log("rocketsQueueMap: ", rocketsQueueMap);
   const currentQueueLen = await redis.llen(rocketsQueueMap[rocketID]);
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen >= MAX_QUEUE_LENGTH) {
     const poppedData = await redis.lpop(rocketsQueueMap[rocketID]);
-    console.log("poppedData: ", poppedData);
+    // console.log("poppedData: ", poppedData);
   }
   // Push only if data is valid, we need at least 10 data entries
   const isValid = await isDataValid(data, rocketID);
-  console.log("isValid: ", isValid);
   if (currentQueueLen <= 10 || isValid) {
+    // console.log("isValid: ", isValid);
     await redis.rpush(rocketsQueueMap[rocketID], JSON.stringify(data));
     // console.log("Data pushed: ", rocketsQueueMap[rocketID], rocketID);
   }
@@ -222,10 +222,11 @@ const retrieveAllDataFromQueue = async (rocketID) => {
 const printAllRocketData = async (rocketID) => {
   // Retrieve all items in the queue
   const data = await retrieveAllDataFromQueue(rocketID);
-  console.log("Items in the queue: ");
+  console.log("Items in the queue for rocket", rocketID, ":");
   data.forEach((item) => {
     console.log(item);
   });
+  console.log("\n");
 };
 
 export { enqueueRocketData, dequeueRocketData, printAllRocketData };
