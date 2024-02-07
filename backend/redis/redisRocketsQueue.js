@@ -178,10 +178,11 @@ const isDataValid = async (dataToBePushed, rocketID) => {
 const enqueueRocketData = async (data, rocketID) => {
   // console.log("rocketsQueueMap: ", rocketsQueueMap);
   const currentQueueLen = await redis.llen(rocketsQueueMap[rocketID]);
+  console.log(rocketID, "currentQueueLen: ", currentQueueLen);
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen >= MAX_QUEUE_LENGTH) {
     const poppedData = await redis.lpop(rocketsQueueMap[rocketID]);
-    // console.log("poppedData: ", poppedData);
+    console.log("poppedData: ", poppedData, currentQueueLen);
   }
   // Push only if data is valid, we need at least 10 data entries
   const isValid = await isDataValid(data, rocketID);
@@ -192,9 +193,10 @@ const enqueueRocketData = async (data, rocketID) => {
   }
 };
 
-// Removes and gets the first data in the weather queue
+// Gets the first data in the weather queue
 const dequeueRocketData = async (rocketID) => {
-  const data = await redis.lpop(rocketsQueueMap[rocketID]);
+  const data = await redis.lindex(rocketsQueueMap[rocketID], 0);
+  // const data = await redis.lpop(rocketsQueueMap[rocketID]);
   return data ? JSON.parse(data) : emptyData;
 };
 
