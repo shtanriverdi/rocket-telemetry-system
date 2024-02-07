@@ -35,43 +35,52 @@ const rocketsQueueMap = { ...rocketsList };
     temperature,
 */
 /* Sample Values For A Rocket from take-off to 20 seconds in the air
-Seconds altitude,   speed,   acceleration, thrust, temperature,
-  0,      0.00,      0.00,      0.00,       0.00,     20.00
-  1,      10.00,     10.00,       9.81,    500.00,     25.00
-  2,      20.00,     20.00,       9.81,    1000.00,    30.00
-  3,      30.00,     30.00,       9.81,    1500.00,    35.00
-  4,      40.00,     40.00,       9.81,    2000.00,    40.00
-  5,      50.00,     50.00,       9.81,    2500.00,    45.00
-  6,      60.00,     60.00,       9.81,    3000.00,    50.00
-  7,      70.00,     70.00,       9.81,    3500.00,    55.00
-  8,      80.00,     80.00,       9.81,    4000.00,    60.00
-  9,      90.00,     90.00,       9.81,    4500.00,    65.00
-  10,    100.00,     100.00,      9.81,    5000.00,    70.00
-  11,    110.00,     110.00,      9.81,    5500.00,    75.00
-  12,    120.00,     120.00,      9.81,    6000.00,    80.00
-  13,    130.00,     130.00,      9.81,    6500.00,    85.00
-  14,    140.00,     140.00,      9.81,    7000.00,    90.00
-  15,    150.00,     150.00,      9.81,    7500.00,    95.00
-  16,    160.00,     160.00,      9.81,    8000.00,    100.00
-  17,    170.00,     170.00,      9.81,    8500.00,    105.00
-  18,    180.00,     180.00,      9.81,    9000.00,    110.00
-  19,    190.00,     190.00,      9.81,    9500.00,    115.00
-  20,    200.00,     200.00,      9.81,    10000.00,     120.00
+Seconds altitude,   speed,   acceleration, thrust, temperature
+0,      0.00,      0.00,      0.00,       0.00,     20.00
+1,      10.00,     5.00,       9.81,    500.00,     25.00
+2,      20.00,     10.00,      9.81,    1000.00,    30.00
+3,      30.00,     15.00,      9.81,    1500.00,    35.00
+4,      40.00,     20.00,      9.81,    2000.00,    40.00
+5,      50.00,     25.00,      9.81,    2500.00,    45.00
+6,      60.00,     30.00,      9.81,    3000.00,    50.00
+7,      70.00,     35.00,      9.81,    3500.00,    55.00
+8,      80.00,     40.00,      9.81,    4000.00,    60.00
+9,      90.00,     45.00,      9.81,    4500.00,    65.00
+10,    100.00,     50.00,      9.81,    5000.00,    70.00
+11,    110.00,     55.00,      9.81,    5500.00,    75.00
+12,    120.00,     60.00,      9.81,    6000.00,    80.00
+13,    130.00,     65.00,      9.81,    6500.00,    85.00
+14,    140.00,     70.00,      9.81,    7000.00,    90.00
+15,    150.00,     75.00,      9.81,    7500.00,    95.00
+16,    160.00,     80.00,      9.81,    8000.00,    100.00
+17,    170.00,     85.00,      9.81,    8500.00,    105.00
+18,    180.00,     90.00,      9.81,    9000.00,    110.00
+19,    190.00,     95.00,      9.81,    9500.00,    115.00
+20,    200.00,     100.00,     9.81,    10000.00,   120.00
+
+Average Altitude: 50 meters
+Average Speed: 25 meters per second
+Average Acceleration: 9.81 meters per second squared
+Average Thrust: 2227.27 Newtons
+Average Temperature: Approximately 41.36 degrees Celsius
 */
-// Difference threshold is 1.0, we can change this value for better precision
+// Difference threshold is 2.0, we can change this value for better precision, I also used standard deviation.
 // I just assumed that a rocket cannot change its for example speed or altitude from 1.xx to 8.xx in a second(1000ms)
 // To be more realistic, we should talk to physicians to set this treshold :)
-const diffAvgMap = {
-  altitude: 1.0,
-  speed: 1.0,
-  acceleration: 1.0,
-  thrust: 1.0,
-  temperature: 1.0,
-};
-
-const isValidFloat = (avgFloat, floatToBeChecked) => {
-  const difference = Math.abs(avgFloat - floatToBeChecked);
-  if (difference <= 2.0) {
+const isValidFloat = (
+  averages,
+  standardDeviations,
+  dataToBeChecked,
+  threshold = 2.0
+) => {
+  for (const [key, value] of Object.entries(dataToBeChecked)) {
+    if (standardDeviations.hasOwnProperty(key)) {
+      const difference = Math.abs(value - averages[key]);
+      if (difference > threshold * standardDeviations[key]) {
+        console.log(`Invalid data for ${key}: ${value}`);
+        return false;
+      }
+    }
   }
   return true;
 };
@@ -88,30 +97,77 @@ const isDataValid = (dataToBePushed, rocketID) => {
 
   const currentData = retrieveAllDataFromQueue(rocketID);
 
-  const curDataSumAvgeMap = {
-    altitude: [0, 0], // [Sum, Avg]
-    speed: [0, 0],
-    acceleration: [0, 0],
-    thrust: [0, 0],
-    temperature: [0, 0],
+  const curDataSumCountMap = {
+    altitude: { sum: 0, count: 0, sumOfSquares: 0 },
+    speed: { sum: 0, count: 0, sumOfSquares: 0 },
+    acceleration: { sum: 0, count: 0, sumOfSquares: 0 },
+    thrust: { sum: 0, count: 0, sumOfSquares: 0 },
+    temperature: { sum: 0, count: 0, sumOfSquares: 0 },
   };
 
   for (const data of currentData) {
-    curDataSumAvgeMap[altitude][0] += data.altitude;
-    curDataSumAvgeMap[speed][0] += data.speed;
-    curDataSumAvgeMap[acceleration][0] += data.acceleration;
-    curDataSumAvgeMap[thrust][0] += data.thrust;
-    curDataSumAvgeMap[temperature][0] += data.temperature;
+    curDataSumCountMap.altitude.sum += data.altitude;
+    curDataSumCountMap.speed.sum += data.speed;
+    curDataSumCountMap.acceleration.sum += data.acceleration;
+    curDataSumCountMap.thrust.sum += data.thrust;
+    curDataSumCountMap.temperature.sum += data.temperature;
+    curDataSumCountMap.altitude.sumOfSquares += Math.pow(data.altitude, 2);
+    curDataSumCountMap.speed.sumOfSquares += Math.pow(data.speed, 2);
+    curDataSumCountMap.acceleration.sumOfSquares += Math.pow(
+      data.acceleration,
+      2
+    );
+    curDataSumCountMap.thrust.sumOfSquares += Math.pow(data.thrust, 2);
+    curDataSumCountMap.temperature.sumOfSquares += Math.pow(
+      data.temperature,
+      2
+    );
+    curDataSumCountMap.altitude.count++;
+    curDataSumCountMap.speed.count++;
+    curDataSumCountMap.acceleration.count++;
+    curDataSumCountMap.thrust.count++;
+    curDataSumCountMap.temperature.count++;
   }
 
-  // Calculated the average for each floating point
-  curDataSumAvgeMap[altitude][1] = curDataSumAvgeMap[altitude][0] / 10;
-  curDataSumAvgeMap[speed][1] = curDataSumAvgeMap[speed][0] / 10;
-  curDataSumAvgeMap[acceleration][1] = curDataSumAvgeMap[acceleration][0] / 10;
-  curDataSumAvgeMap[thrust][1] = curDataSumAvgeMap[thrust][0] / 10;
-  curDataSumAvgeMap[temperature][1] = curDataSumAvgeMap[temperature][0] / 10;
+  const averages = {
+    altitude:
+      curDataSumCountMap.altitude.sum / curDataSumCountMap.altitude.count,
+    speed: curDataSumCountMap.speed.sum / curDataSumCountMap.speed.count,
+    acceleration:
+      curDataSumCountMap.acceleration.sum /
+      curDataSumCountMap.acceleration.count,
+    thrust: curDataSumCountMap.thrust.sum / curDataSumCountMap.thrust.count,
+    temperature:
+      curDataSumCountMap.temperature.sum / curDataSumCountMap.temperature.count,
+  };
 
-  getAverage(curDataSumMap);
+  const standardDeviations = {
+    altitude: Math.sqrt(
+      curDataSumCountMap.altitude.sumOfSquares /
+        curDataSumCountMap.altitude.count -
+        Math.pow(averages.altitude, 2)
+    ),
+    speed: Math.sqrt(
+      curDataSumCountMap.speed.sumOfSquares / curDataSumCountMap.speed.count -
+        Math.pow(averages.speed, 2)
+    ),
+    acceleration: Math.sqrt(
+      curDataSumCountMap.acceleration.sumOfSquares /
+        curDataSumCountMap.acceleration.count -
+        Math.pow(averages.acceleration, 2)
+    ),
+    thrust: Math.sqrt(
+      curDataSumCountMap.thrust.sumOfSquares / curDataSumCountMap.thrust.count -
+        Math.pow(averages.thrust, 2)
+    ),
+    temperature: Math.sqrt(
+      curDataSumCountMap.temperature.sumOfSquares /
+        curDataSumCountMap.temperature.count -
+        Math.pow(averages.temperature, 2)
+    ),
+  };
+
+  return isValidFloat(averages, standardDeviations, dataToBePushed);
 };
 
 // Appends data into the rockets queue
