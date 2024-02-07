@@ -125,13 +125,26 @@ rockets.forEach((rocket) => {
   const TCPSocket = new net.Socket();
   const { id, host, port } = rocket;
 
+  // Create a socket.io namespace for each rocket
+  const rocketNamespace = io.of(`/rockets/${id}`);
+
+  // Listen for connection on this namespace
+  rocketNamespace.on("connection", (socket) => {
+    console.log(`Socket.io connected for rocket: ${id}`);
+  });
+
+  // Add the rocket ID to the rocketNamespace object for reference
+  // rocketNamespace.rocketID = id;
+
+  // rocketNamespace.emit("rocketData", );
+
   // Establish the connection
   TCPSocket.connect(port, host, () => {
     console.log(`Connected via TCP for rocket: ${id}`);
   });
 
   // When data is received
-  TCPSocket.on("data", (bufferData) => {
+  TCPSocket.on("data", async (bufferData) => {
     const { rocketID, altitude, speed, acceleration, thrust, temperature } =
       bufferToJson(bufferData);
     // console.log(rocketID, altitude, speed, acceleration, thrust, temperature);
@@ -144,12 +157,15 @@ rockets.forEach((rocket) => {
     };
 
     // Save data to redis queue of specific rocket
-    enqueueRocketData(rocketTelemetryData, rocketID);
+    await enqueueRocketData(rocketTelemetryData, rocketID);
     // printAllRocketDataAsJSON(rocketID);
-    printAllRocketDataAsString(rocketID);
-
+    // printAllRocketDataAsString(rocketID);
+    // This data comes from redis queue which is cleaned & validified data
+    const poppedData = await dequeueRocketData(rocketID);
+    // console.log("poppedData: ", poppedData);
+    rocketNamespace.emit("rocketData", poppedData);
     // Emit rocketData to the specific rocket room
-    // io.to(rocketID).emit("rocketData", rocketTelemetryData);
+    // io.to(rocketID).emit("rocketData", poppedData);
   });
 
   TCPSocket.on("close", () => {
@@ -162,10 +178,15 @@ rockets.forEach((rocket) => {
   });
 
   // Create a socket.io room for each rocket
-  io.on("connection", (socket) => {
-    console.log(`Socket.io connected for rocket: ${id}`);
-    socket.join(id);
-  });
+  // io.of(`/rockets/${id}`).on("connection", (socket) => {
+  //   console.log(`Socket.io connected for rocket: ${id}`);
+  // });
+
+  // Create a socket.io room for each rocket
+  // io.on("connection", (socket) => {
+  //   console.log(`Socket.io connected for rocket: ${id}`);
+  //   socket.join(id);
+  // });
 
   // Closes the TCP connection
   // TCPSocket.destroy();

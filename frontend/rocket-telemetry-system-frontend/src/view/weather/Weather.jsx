@@ -118,7 +118,7 @@ export default function Weather() {
                     : "green",
               }}>
               {isConnected === 0 && "Disconnected"}
-              {isConnected === 1 && "Loading..."}
+              {isConnected === 1 && "Connecting..."}
               {isConnected === 2 && "Connected"}
             </span>
           </p>

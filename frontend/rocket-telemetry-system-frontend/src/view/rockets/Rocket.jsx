@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 
 const ROCKETS_URL = "http://localhost:3000";
 
-// Socket.io server address, autoconnect is off
-const socket = io(ROCKETS_URL, {
-  autoConnect: false,
-});
-
 export default function Rocket({ rocketData }) {
+  // Socket.io server address, autoconnect is off
+  const socket = io(ROCKETS_URL + `/rockets/${rocketData.id}`, {
+    autoConnect: false,
+  });
+
   // Telemetry
   const { host, port } = rocketData.telemetry;
 
@@ -44,12 +44,8 @@ export default function Rocket({ rocketData }) {
       setRocketConnected(1);
       // Enabled the socket
       socket.connect();
-      // Join the specific rocket room
-      socket.emit("joinRoom", id);
     } else if (isRocketConnected === 2) {
-      // Leaves for specific room
-      socket.emit("leaveRoom", id);
-      // Disconnects the socket manually. In that case, the socket will not try to reconnect.
+      socket.off("rocketData");
       socket.disconnect();
       setRocketConnected(0);
     }
@@ -57,19 +53,19 @@ export default function Rocket({ rocketData }) {
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Socket.io connected");
+      console.log("Socket.io connected for Rocket: ", id);
       setRocketConnected(2);
     });
 
     socket.on("rocketData", (data) => {
-      // console.log(`Roket data received (${id}):`, data);
+      console.log(`Roket data received (${id}):`, data);
       setTelemetryState(data);
     });
 
     socket.on("connect_error", (error) => {
       console.error("Socket.io connection error:", error);
       // Leaves tor specific room
-      socket.emit("leaveRoom", id);
+      // socket.emit("leaveRoom", id);
       // Disconnects the socket manually. In that case, the socket will not try to reconnect.
       socket.disconnect();
       setRocketConnected(0);
