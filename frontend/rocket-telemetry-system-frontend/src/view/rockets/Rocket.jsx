@@ -46,7 +46,6 @@ export default function Rocket({ rocketData }) {
       socket.connect();
       // Join the specific rocket room
       socket.emit("joinRoom", id);
-      console.log(socket.connected);
     } else if (isRocketConnected === 2) {
       // Leaves tor specific room
       socket.emit("leaveRoom", id);
@@ -61,6 +60,7 @@ export default function Rocket({ rocketData }) {
       console.log("Socket.io connected");
       setRocketConnected(2);
     });
+
     socket.on("rocketData", (data) => {
       console.log(`Roket data received (${id}):`, data);
       setTelemetryState(data);
@@ -68,6 +68,10 @@ export default function Rocket({ rocketData }) {
 
     socket.on("connect_error", (error) => {
       console.error("Socket.io connection error:", error);
+      // Leaves tor specific room
+      socket.emit("leaveRoom", id);
+      // Disconnects the socket manually. In that case, the socket will not try to reconnect.
+      socket.disconnect();
       setRocketConnected(0);
     });
   }, [isRocketConnected]);
