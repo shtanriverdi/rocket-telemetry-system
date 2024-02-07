@@ -82,17 +82,11 @@ export default function Weather() {
       });
 
       socket.on("disconnect", () => {
-        console.log("Disconnected!");
+        console.log("Weather Socket Disconnected!");
         socket.disconnect();
         socket.off("weatherData");
         setIsConnected(0);
       });
-
-      return () => {
-        socket.disconnect();
-        socket.off("weatherData");
-        setIsConnected(0);
-      };
     };
 
     runFethingData();
