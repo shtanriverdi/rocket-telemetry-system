@@ -113,10 +113,57 @@ weatherNamespace.on("terminate", function () {
 // ------------------------ Rockets ------------------------
 
 // Create a TCP connection for each rocket
-// rockets.forEach((rocket) => {
-//   // Creates new TCP Socket
+rockets.forEach((rocket) => {
+  // Creates new TCP Socket
+  const TCPSocket = new net.Socket();
+  const { id, host, port } = rocket;
+
+  // Establish the connection
+  TCPSocket.connect(port, host, () => {
+    console.log(`Connected via TCP for rocket: ${id}`);
+  });
+
+  // When data is received
+  TCPSocket.on("data", (bufferData) => {
+    const { rocketID, altitude, speed, acceleration, thrust, temperature } =
+      bufferToJson(bufferData);
+    console.log(rocketID, altitude, speed, acceleration, thrust, temperature);
+    const rocketTelemetryData = {
+      altitude,
+      speed,
+      acceleration,
+      thrust,
+      temperature,
+    };
+    // Emit rocketData to the specific rocket room
+    io.to(rocketID).emit("rocketData", rocketTelemetryData);
+  });
+
+  TCPSocket.on("close", () => {
+    console.log(`TCP connection ended for rocket: ${id}`);
+  });
+
+  // Error
+  TCPSocket.on("error", (err) => {
+    console.error(`Socket/TCP Error: ${err.message}`);
+  });
+
+  // Create a socket.io room for each rocket
+  io.on("connection", (socket) => {
+    console.log(`Socket.io connected for rocket: ${id}`);
+    socket.join(id);
+  });
+
+  // Closes the TCP connection
+  // TCPSocket.destroy();
+});
+
+// // Creates a TCP connection and socket for given rocket
+// function runRocketTCPSocket(id, host, port) {
+//   // Creates and stores new TCP Socket for a given rocket
 //   const TCPSocket = new net.Socket();
-//   const { id, host, port } = rocket;
+//   app.set(id, TCPSocket);
+//   console.log("app.get(id):", app.get(id));
 
 //   // Establish the connection
 //   TCPSocket.connect(port, host, () => {
@@ -146,66 +193,26 @@ weatherNamespace.on("terminate", function () {
 //     console.log(`Socket.io connected for rocket: ${id}`);
 //     socket.join(id);
 //   });
+// }
 
-//   // Closes the TCP connection
-//   // TCPSocket.destroy();
+// function stopRocketSocket(rocketId) {}
+
+// // Rockets middlewares { status: "on" | "off" }
+// app.get("/rockets/:rocketId/:status", (req, res) => {
+//   const rocketId = req.params.rocketId;
+//   const status = req.params.status;
+//   let response = "empty";
+//   console.log("rocketId:", rocketId, " status:", status);
+//   if (status === "on") {
+//     runRocketSocket(rocketId);
+//     response = "connected";
+//   } else if (status === "off") {
+//     stopRocketSocket(rocketId);
+//     response = "disconnected";
+//   }
+//   // Set the response in the JSON object
+//   res.json({ response });
 // });
-
-// Creates a TCP connection and socket for given rocket
-function runRocketTCPSocket(id, host, port) {
-  // Creates and stores new TCP Socket for a given rocket
-  const TCPSocket = new net.Socket();
-  app.set(id, TCPSocket);
-  console.log("app.get(id):", app.get(id));
-
-  // Establish the connection
-  TCPSocket.connect(port, host, () => {
-    console.log(`Connected via TCP for rocket: ${id}`);
-  });
-
-  // When data is received
-  TCPSocket.on("data", (bufferData) => {
-    const rocketData = bufferToJson(bufferData);
-    const rocketID = rocketData.rocketID;
-    console.log(rocketData);
-    // Emit rocketData to the specific rocket room
-    io.to(rocketID).emit("rocketData", rocketData);
-  });
-
-  TCPSocket.on("close", () => {
-    console.log(`TCP connection ended for rocket: ${id}`);
-  });
-
-  // Error
-  TCPSocket.on("error", (err) => {
-    console.error(`Socket/TCP Error: ${err.message}`);
-  });
-
-  // Create a socket.io room for each rocket
-  io.on("connection", (socket) => {
-    console.log(`Socket.io connected for rocket: ${id}`);
-    socket.join(id);
-  });
-}
-
-function stopRocketSocket(rocketId) {}
-
-// Rockets middlewares { status: "on" | "off" }
-app.get("/rockets/:rocketId/:status", (req, res) => {
-  const rocketId = req.params.rocketId;
-  const status = req.params.status;
-  let response = "empty";
-  console.log("rocketId:", rocketId, " status:", status);
-  if (status === "on") {
-    runRocketSocket(rocketId);
-    response = "connected";
-  } else if (status === "off") {
-    stopRocketSocket(rocketId);
-    response = "disconnected";
-  }
-  // Set the response in the JSON object
-  res.json({ response });
-});
 
 // ------------------------ Express --------------------------
 

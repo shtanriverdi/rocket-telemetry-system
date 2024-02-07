@@ -11,35 +11,96 @@ const socket = io(ROCKETS_URL, {
 export default function Rocket({ rocketData }) {
   // Telemetry
   const { host, port } = rocketData.telemetry;
-  // RestAPI Data
+
+  // RestAPI Data | This data comes from RestAPI
   const { id, model, mass, payload, status, timestamps } = rocketData;
-  // Real time data from telemetry stream
+
+  // Real time data from telemetry stream | This data comes from TCP Connection!
   const { altitude, speed, acceleration, thrust, temperature } = rocketData;
 
   // Rockets data state
-  const [rocketState, setRocketState] = useState("");
+  const [rocketState, setRocketState] = useState({
+    id,
+    model,
+    mass,
+    payload,
+    status,
+    timestamps,
+  });
+
+  // Rocket telemetry data state
+  const [telemetryState, setTelemetryState] = useState({
+    altitude,
+    speed,
+    acceleration,
+    thrust,
+    temperature,
+  });
+  // Socket connection has 3 states: { 0: disconnected, 1: connecting..., 2: connected }
+  const [isRocketConnected, setRocketConnected] = useState(0);
+
+  const handleSocketConnection = () => {
+    if (isRocketConnected === 0) {
+      setRocketConnected(1);
+      // Enabled the socket
+      socket.connect();
+      // Join the specific rocket room
+      socket.emit("joinRoom", id);
+      console.log(socket.connected);
+    } else if (isRocketConnected === 2) {
+      // Leaves tor specific room
+      socket.emit("leaveRoom", id);
+      // Disconnects the socket manually. In that case, the socket will not try to reconnect.
+      socket.disconnect();
+      setRocketConnected(0);
+    }
+  };
 
   useEffect(() => {
-    // Join the specific rocket room
-    socket.emit("joinRoom", id);
-
-    // Veri alındığında
+    socket.on("connect", () => {
+      console.log("Socket.io connected");
+      setRocketConnected(2);
+    });
     socket.on("rocketData", (data) => {
       console.log(`Roket data received (${id}):`, data);
-      setRocketState(data);
+      setTelemetryState(data);
     });
 
-    return () => {
-      socket.disconnect();
-    };
-  });
+    socket.on("connect_error", (error) => {
+      console.error("Socket.io connection error:", error);
+      setRocketConnected(0);
+    });
+  }, [isRocketConnected]);
 
   return (
     <div className="rocket-container p">
-      <div>Tele Data TEST: {rocketState.toString()}</div>
       <div className="m-b">
         <p className="text-center m-bs">
-          <b>Rocket:</b> {id}
+          <b>Rocket: </b>
+          {id}&nbsp;&nbsp;
+          <button
+            disabled={isRocketConnected === 1}
+            onClick={handleSocketConnection}>
+            {isRocketConnected === 0 && "Connect"}
+            {isRocketConnected === 1 && "Connecting"}
+            {isRocketConnected === 2 && "Disconnect"}
+          </button>
+          <small>
+            <b>Connection: </b>
+          </small>
+          <small
+            style={{
+              color:
+                isRocketConnected === 0
+                  ? "red"
+                  : isRocketConnected === 1
+                  ? "gray"
+                  : "green",
+            }}>
+            {isRocketConnected === 0 && "Disconnected"}
+            {isRocketConnected === 1 && "Connecting..."}
+            {isRocketConnected === 2 && "Connected"}
+          </small>
         </p>
         <p>
           <b>Payload:</b> {payload.description}
@@ -75,14 +136,16 @@ export default function Rocket({ rocketData }) {
         </div>
       </div>
       <p className="m-t m-b">
-        <b>Status:</b> {status}
+        <b>Rocket Status:</b> {status}
         <li className="no-bullet">
           <b>Host/Port:</b> {host + ":" + port}
         </li>
       </p>
       <div className="flex-container">
-        <button className="m-r">Launch</button>
-        <button>Cancel</button>
+        <button disabled={isRocketConnected === 0} className="m-r">
+          Launch
+        </button>
+        <button disabled={isRocketConnected === 0}>Cancel</button>
       </div>
     </div>
   );
