@@ -79,20 +79,7 @@ export default function Rocket({ rocketData }) {
   return (
     <div className="rocket-container p">
       <div className="flex-container-outer">
-        <p className="text-center m-bs">
-          <b>Rocket: </b>
-          {id}&nbsp;&nbsp;
-        </p>
-        <button
-          disabled={isRocketConnected === 1}
-          onClick={handleSocketConnection}>
-          {isRocketConnected === 0 && "Connect"}
-          {isRocketConnected === 1 && "Connecting"}
-          {isRocketConnected === 2 && "Disconnect"}
-        </button>
-      </div>
-      <div className="m-b">
-        <div className="m-b flex-container-centerize">
+        <div className="m-bs flex-container-centerize">
           <p>
             <b>Connection:&nbsp;</b>
           </p>
@@ -111,6 +98,19 @@ export default function Rocket({ rocketData }) {
             {isRocketConnected === 2 && "Connected"}&nbsp;
           </p>
         </div>
+        <p className="text-center m-b">
+          <b>Rocket: </b>
+          {id}&nbsp;&nbsp;
+        </p>
+        <button
+          disabled={isRocketConnected === 1}
+          onClick={handleSocketConnection}>
+          {isRocketConnected === 0 && "Connect"}
+          {isRocketConnected === 1 && "Connecting"}
+          {isRocketConnected === 2 && "Disconnect"}
+        </button>
+      </div>
+      <div className="m-b">
         <p>
           <b>Payload:</b> {payload.description}
         </p>
