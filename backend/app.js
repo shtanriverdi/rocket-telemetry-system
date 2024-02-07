@@ -40,7 +40,8 @@ import {
 import {
   enqueueRocketData,
   dequeueRocketData,
-  printAllRocketData,
+  printAllRocketDataAsJSON,
+  printAllRocketDataAsString,
 } from "./redis/redisRocketsQueue.js";
 
 // Fix cors error, add middleware
@@ -144,7 +145,8 @@ rockets.forEach((rocket) => {
 
     // Save data to redis queue of specific rocket
     enqueueRocketData(rocketTelemetryData, rocketID);
-    printAllRocketData(rocketID);
+    // printAllRocketDataAsJSON(rocketID);
+    printAllRocketDataAsString(rocketID);
 
     // Emit rocketData to the specific rocket room
     // io.to(rocketID).emit("rocketData", rocketTelemetryData);

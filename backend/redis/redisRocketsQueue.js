@@ -97,7 +97,7 @@ const isDataValid = async (dataToBePushed, rocketID) => {
     thrustToBeChecked,
     temperatureToBeChecked,
   } = dataToBePushed;
-  const currentData = await retrieveAllDataFromQueue(rocketID);
+  const currentData = await retrieveAllDataFromQueue(rocketID, true);
   const curDataSumCountMap = {
     altitude: { sum: 0, count: 0, sumOfSquares: 0 },
     speed: { sum: 0, count: 0, sumOfSquares: 0 },
@@ -199,8 +199,7 @@ const dequeueRocketData = async (rocketID) => {
 };
 
 // Retrieves all items in the given rocketID's queue
-const retrieveAllDataFromQueue = async (rocketID) => {
-  // console.log("rocketsQueueMap[rocketID]: ", rocketsQueueMap[rocketID], typeof rocketsQueueMap[rocketID]);
+const retrieveAllDataFromQueue = async (rocketID, seekJSON) => {
   try {
     const data = await redis.lrange(
       rocketsQueueMap[rocketID],
@@ -212,16 +211,19 @@ const retrieveAllDataFromQueue = async (rocketID) => {
         }
       }
     );
-    const dataList = data.map((d) => JSON.parse(d));
-    return dataList;
+    if (seekJSON) {
+      const dataList = data.map((d) => JSON.parse(d));
+      return dataList;
+    }
+    return data;
   } catch (error) {
     console.error("Error getting items from the redis queue:", error);
   }
 };
 
-const printAllRocketData = async (rocketID) => {
+const printAllRocketDataAsJSON = async (rocketID) => {
   // Retrieve all items in the queue
-  const data = await retrieveAllDataFromQueue(rocketID);
+  const data = await retrieveAllDataFromQueue(rocketID, true);
   console.log("Items in the queue for rocket", rocketID, ":");
   data.forEach((item) => {
     console.log(item);
@@ -229,4 +231,16 @@ const printAllRocketData = async (rocketID) => {
   console.log("\n");
 };
 
-export { enqueueRocketData, dequeueRocketData, printAllRocketData };
+const printAllRocketDataAsString = async (rocketID) => {
+  // Retrieve all items in the queue
+  const data = await retrieveAllDataFromQueue(rocketID, false);
+  console.log("Items in the queue for rocket", rocketID, ":");
+  console.log(data, "\n");
+};
+
+export {
+  enqueueRocketData,
+  dequeueRocketData,
+  printAllRocketDataAsJSON,
+  printAllRocketDataAsString,
+};
