@@ -49,7 +49,7 @@ app.use((req, res, next) => {
 app.get("/weather/:status", (req, res) => {
   const status = req.params.status;
   let response = "empty";
-  console.log("status:", status);
+  // console.log("status:", status);
   if (status === "on") {
     runWeatherSocket();
     response = "connected";
@@ -127,7 +127,7 @@ rockets.forEach((rocket) => {
   TCPSocket.on("data", (bufferData) => {
     const { rocketID, altitude, speed, acceleration, thrust, temperature } =
       bufferToJson(bufferData);
-    console.log(rocketID, altitude, speed, acceleration, thrust, temperature);
+    // console.log(rocketID, altitude, speed, acceleration, thrust, temperature);
     const rocketTelemetryData = {
       altitude,
       speed,

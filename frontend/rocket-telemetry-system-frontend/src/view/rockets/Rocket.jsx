@@ -47,7 +47,7 @@ export default function Rocket({ rocketData }) {
       // Join the specific rocket room
       socket.emit("joinRoom", id);
     } else if (isRocketConnected === 2) {
-      // Leaves tor specific room
+      // Leaves for specific room
       socket.emit("leaveRoom", id);
       // Disconnects the socket manually. In that case, the socket will not try to reconnect.
       socket.disconnect();
