@@ -78,35 +78,37 @@ export default function Rocket({ rocketData }) {
 
   return (
     <div className="rocket-container p">
-      <div className="m-b">
-        <p className="text-center m-b">
+      <div className="flex-container-outer">
+        <p className="text-center m-bs">
           <b>Rocket: </b>
           {id}&nbsp;&nbsp;
         </p>
-        <div className="m-b">
+        <button
+          disabled={isRocketConnected === 1}
+          onClick={handleSocketConnection}>
+          {isRocketConnected === 0 && "Connect"}
+          {isRocketConnected === 1 && "Connecting"}
+          {isRocketConnected === 2 && "Disconnect"}
+        </button>
+      </div>
+      <div className="m-b">
+        <div className="m-b flex-container-centerize">
           <p>
-            <b>Connection: </b>
-            <p
-              className="inline-block"
-              style={{
-                color:
-                  isRocketConnected === 0
-                    ? "red"
-                    : isRocketConnected === 1
-                    ? "gray"
-                    : "green",
-              }}>
-              {isRocketConnected === 0 && "Disconnected"}
-              {isRocketConnected === 1 && "Connecting..."}
-              {isRocketConnected === 2 && "Connected"}&nbsp;
-              <button
-                disabled={isRocketConnected === 1}
-                onClick={handleSocketConnection}>
-                {isRocketConnected === 0 && "Connect"}
-                {isRocketConnected === 1 && "Connecting"}
-                {isRocketConnected === 2 && "Disconnect"}
-              </button>
-            </p>
+            <b>Connection:&nbsp;</b>
+          </p>
+          <p
+            className="inline-block"
+            style={{
+              color:
+                isRocketConnected === 0
+                  ? "red"
+                  : isRocketConnected === 1
+                  ? "gray"
+                  : "green",
+            }}>
+            {isRocketConnected === 0 && "Disconnected"}
+            {isRocketConnected === 1 && "Connecting..."}
+            {isRocketConnected === 2 && "Connected"}&nbsp;
           </p>
         </div>
         <p>

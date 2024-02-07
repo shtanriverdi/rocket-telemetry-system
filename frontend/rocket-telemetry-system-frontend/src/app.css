@@ -5,6 +5,18 @@
   align-items: baseline;
 }
 
+.flex-container-centerize {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-container-outer {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
 .outer-container {
   display: flex;
   align-items: center;
