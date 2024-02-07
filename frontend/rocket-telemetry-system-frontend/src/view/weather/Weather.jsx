@@ -35,6 +35,15 @@ export default function Weather() {
     },
   });
 
+  const stopConnection = async () => {
+    await fetch(WEATHER_URL + "/off");
+    // const response = await fetch(WEATHER_URL + "/off");
+    // const { response: data } = await response.json();
+    socket.disconnect();
+    socket.off("weatherData");
+    setIsConnected(0);
+  };
+
   const handleWeatherSocketConnection = async () => {
     // Connect weather socket
     if (isConnected === 0) {
@@ -126,6 +135,7 @@ export default function Weather() {
         <button
           className="btn"
           onClick={() => {
+            stopConnection();
             window.location.reload();
           }}>
           Reset System

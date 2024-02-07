@@ -78,7 +78,7 @@ function runWeatherSocket() {
     // await printAllData();
   }, 100);
   app.set("weatherRedisInterval", weatherRedisInterval);
-  console.log("weatherRedisInterval:", app.get("weatherRedisInterval"));
+  // console.log("weatherRedisInterval:", app.get("weatherRedisInterval"));
 }
 
 // Creates a listener for weather
@@ -112,32 +112,51 @@ weatherNamespace.on("terminate", function () {
 
 // ------------------------ Rockets ------------------------
 
-// Creates namespace for each rocket
-console.log("Rockets:");
-// rockets.forEach((rocket) => {
-// const { id, host, port } = rocket;
-// console.log(id, host, port);
-// const rocketNamespace = io.of(`/rocket-${id}`);
-
-// rocketNamespace.on("connection", (socket) => {
-//   console.log(`Connected to telemetry of rocket ${id} at ${host}:${port}`);
-
-//   socket.on("telemetry", (data) => {
-//     console.log(`Telemetry data from rocket ${id}:`, data);
-//   });
-// });
-
-// const telemetrySocket = io(`http://${host}:${port}`);
-// telemetrySocket.on("connect", () => {
-//   console.log(`Connected to telemetry of rocket ${id}`);
-// });
-// });
-
 // Create a TCP connection for each rocket
-rockets.forEach((rocket) => {
-  // Creates new TCP Socket
+// rockets.forEach((rocket) => {
+//   // Creates new TCP Socket
+//   const TCPSocket = new net.Socket();
+//   const { id, host, port } = rocket;
+
+//   // Establish the connection
+//   TCPSocket.connect(port, host, () => {
+//     console.log(`Connected via TCP for rocket: ${id}`);
+//   });
+
+//   // When data is received
+//   TCPSocket.on("data", (bufferData) => {
+//     const rocketData = bufferToJson(bufferData);
+//     const rocketID = rocketData.rocketID;
+//     console.log(rocketData);
+//     // Emit rocketData to the specific rocket room
+//     io.to(rocketID).emit("rocketData", rocketData);
+//   });
+
+//   TCPSocket.on("close", () => {
+//     console.log(`TCP connection ended for rocket: ${id}`);
+//   });
+
+//   // Error
+//   TCPSocket.on("error", (err) => {
+//     console.error(`Socket/TCP Error: ${err.message}`);
+//   });
+
+//   // Create a socket.io room for each rocket
+//   io.on("connection", (socket) => {
+//     console.log(`Socket.io connected for rocket: ${id}`);
+//     socket.join(id);
+//   });
+
+//   // Closes the TCP connection
+//   // TCPSocket.destroy();
+// });
+
+// Creates a TCP connection and socket for given rocket
+function runRocketTCPSocket(id, host, port) {
+  // Creates and stores new TCP Socket for a given rocket
   const TCPSocket = new net.Socket();
-  const { id, host, port } = rocket;
+  app.set(id, TCPSocket);
+  console.log("app.get(id):", app.get(id));
 
   // Establish the connection
   TCPSocket.connect(port, host, () => {
@@ -167,9 +186,7 @@ rockets.forEach((rocket) => {
     console.log(`Socket.io connected for rocket: ${id}`);
     socket.join(id);
   });
-});
-
-function runRocketSocket(rocketId) {}
+}
 
 function stopRocketSocket(rocketId) {}
 
@@ -190,86 +207,12 @@ app.get("/rockets/:rocketId/:status", (req, res) => {
   res.json({ response });
 });
 
-// Creates a listener for rockets
-// const rocketsTelemetryNamespace = io.of("/rockets-telemetry");
-// const telemetryConnections = {};
-// // Receives big-endian notation, returns JSON
-// const parseTelemetryData = () => {
-//   // TODO
-// };
-
-// rocketsTelemetryNamespace.on("connection", (socket) => {
-//   console.log("Rocket telemetry namespace connected");
-
-//   // Runs every second
-//   const rocketsInterval = setInterval(async () => {
-//     try {
-//       const { data: rocketsData } = await getRocketsData();
-
-//       // Create TCP Telemetry connection for each rocket
-//       rocketsData.forEach((rocket) => {
-//         // If the connection is not created before
-//         if (!telemetryConnections[rocket.id]) {
-//           // Craete new telemetry connection
-//           const { host, port } = rocket.telemetry;
-//           const rocketSocket = io.connect(host + ":" + port);
-//           // const rocketSocket = io.connect("http://" + host + ":" + port); // TRY
-//           rocketSocket.on("rocket-telemetry", (telemetryData) => {
-//             const parsedData = parseTelemetryData(telemetryData);
-//             rocketsTelemetryNamespace.emit(
-//               `rocket-telemetry-${rocket.id}`,
-//               telemetryData
-//             );
-//           });
-
-//           // Store the socket with rocket id
-//           telemetryConnections[rocket.id] = rocketSocket;
-//         }
-//       });
-//     } catch (error) {
-//       console.log("Error fetching rocket telemetry data: ", error.message);
-//     }
-//   }, 1000);
-
-//   // Clear the interval when disconnected
-//   socket.on("disconnect", () => {
-//     console.log("A client disconnected from telemetry namespace");
-//     // Stop the interval
-//     clearInterval(rocketsInterval);
-//     // Shut down all the telemetry connection of the rockets
-//     Object.values(telemetryConnections).forEach((rocketSocket) => {
-//       rocketSocket.disconnect();
-//     });
-//   });
-// });
-
 // ------------------------ Express --------------------------
+
 // Starts the server
 server.listen(port, () => {
   console.log(`Rocket Server is up and running on port ${port}`);
 });
-
-// Rockets
-// app.get("/getRocketsData", async (req, res) => {
-//   const { data: rocketsData } = await getRocketsData();
-//   console.log("Rockets data: ");
-//   for (const rocket of rocketsData) {
-//     console.log(rocket);
-//   }
-//   res.json(rocketsData);
-// });
-
-// Weather
-// app.get("/runWeatherSocket", (req, res) => {
-//   stopWeatherSocket();
-//   next();
-// });
-
-// app.get("/getWeatherData", async (req, res) => {
-//   const { data: weatherData } = await getWeatherData();
-//   console.log("Weather data: ", weatherData);
-//   res.json(weatherData);
-// });
 
 app.get("*", (req, res) => {
   res.send("Route Not Found!");
