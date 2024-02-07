@@ -1,3 +1,13 @@
+import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
+
+const ROCKETS_URL = "http://localhost:3000";
+
+// Socket.io server address, autoconnect is off
+const socket = io(ROCKETS_URL, {
+  autoConnect: false,
+});
+
 export default function Rocket({ rocketData }) {
   // Telemetry
   const { host, port } = rocketData.telemetry;
@@ -6,8 +16,27 @@ export default function Rocket({ rocketData }) {
   // Real time data from telemetry stream
   const { altitude, speed, acceleration, thrust, temperature } = rocketData;
 
+  // Rockets data state
+  const [rocketState, setRocketState] = useState("");
+
+  useEffect(() => {
+    // Join the specific rocket room
+    socket.emit("joinRoom", id);
+
+    // Veri alındığında
+    socket.on("rocketData", (data) => {
+      console.log(`Roket data received (${id}):`, data);
+      setRocketState(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  });
+
   return (
     <div className="rocket-container p">
+      <div>Tele Data TEST: {rocketState.toString()}</div>
       <div className="m-b">
         <p className="text-center m-bs">
           <b>Rocket:</b> {id}
