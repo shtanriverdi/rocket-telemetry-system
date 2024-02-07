@@ -26,6 +26,11 @@ const rocketsList = rockets.map((rocketData) => rocketData.rocketID);
 // Stores specific queue for each rocket using rocket IDs
 const rocketsQueueMap = { ...rocketsList };
 
+// Discards invalid data
+const dataCorrection = (dataToBePushed, rocketID) => {
+  redis;
+};
+
 // Appends data into the rockets queue
 // Time Comp: O(1)
 const enqueueRocketData = async (data, rocketID) => {
@@ -45,4 +50,24 @@ const dequeueRocketData = async (rocketID) => {
   return data ? JSON.parse(data) : emptyData;
 };
 
-export { enqueueRocketData, dequeueRocketData };
+// Retrieves all items in the given rocketID's queue
+const retrieveAllDataFromQueue = (rocketID) => {
+  redis.lrange(rocketsQueueMap[rocketID], 0, -1, (err, data) => {
+    if (err) {
+      console.error("Error getting items from the queue:", err);
+    }
+    return data;
+  });
+};
+
+const printAllRocketData = (rocketID) => {
+  // Retrieve all items in the queue
+  const data = retrieveAllDataFromQueue(rocketID);
+  console.log("Items in the queue: ");
+  data.forEach((item) => {
+    const jsonItem = JSON.parse(item);
+    console.log(jsonItem);
+  });
+};
+
+export { enqueueRocketData, dequeueRocketData, printAllRocketData };
