@@ -68,9 +68,10 @@ export default function Rocket({ rocketData }) {
       // socket.emit("leaveRoom", id);
       // Disconnects the socket manually. In that case, the socket will not try to reconnect.
       socket.disconnect();
+      socket.off("rocketData");
       setRocketConnected(0);
     });
-  }, [isRocketConnected]);
+  }, [id, isRocketConnected, socket]);
 
   return (
     <div className="rocket-container p">

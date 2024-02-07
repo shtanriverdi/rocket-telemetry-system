@@ -9,7 +9,7 @@ import Redis from "ioredis";
 const redis = new Redis();
 
 // Queue lenght limit
-const MAX_QUEUE_LENGTH = 100;
+const MAX_QUEUE_LENGTH = 500;
 
 const emptyData = {
   altitude: 0,
@@ -185,7 +185,7 @@ const enqueueRocketData = async (data, rocketID) => {
   }
   // Push only if data is valid, we need at least 10 data entries
   const isValid = await isDataValid(data, rocketID);
-  if (currentQueueLen <= 10 || isValid) {
+  if (currentQueueLen <= 100 || isValid) {
     // console.log("isValid: ", isValid);
     await redis.rpush(rocketsQueueMap[rocketID], JSON.stringify(data));
     // console.log("Data pushed: ", rocketsQueueMap[rocketID], rocketID);

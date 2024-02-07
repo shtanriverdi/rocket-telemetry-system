@@ -161,9 +161,9 @@ rockets.forEach((rocket) => {
     // printAllRocketDataAsJSON(rocketID);
     // printAllRocketDataAsString(rocketID);
     // This data comes from redis queue which is cleaned & validified data
-    const poppedData = await dequeueRocketData(rocketID);
+    // const poppedData = await dequeueRocketData(rocketID);
     // console.log("poppedData: ", poppedData);
-    rocketNamespace.emit("rocketData", poppedData);
+    // rocketNamespace.emit("rocketData", poppedData);
     // Emit rocketData to the specific rocket room
     // io.to(rocketID).emit("rocketData", poppedData);
   });
