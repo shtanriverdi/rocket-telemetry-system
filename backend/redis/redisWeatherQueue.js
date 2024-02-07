@@ -19,7 +19,7 @@ let lastRecentWeatherData = {};
 // Weather data queue
 const weatherQueueName = "weatherQueue";
 
-const printAllData = () => {
+const printAllData = async () => {
   // Retrieve all items in the queue
   redis.lrange(weatherQueueName, 0, -1, (err, items) => {
     if (err) {

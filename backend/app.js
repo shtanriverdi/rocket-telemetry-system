@@ -1,4 +1,5 @@
 import { getRocketsData, getWeatherData } from "./utils/endpoints.js";
+
 // This could have been done via get request
 // For the sake of simplicity, I wanted to use this way
 import rockets from "./utils/rocketsHostInfo.js";
@@ -35,7 +36,12 @@ import {
   dequeueWeatherData,
   printAllData,
 } from "./redis/redisWeatherQueue.js";
-import { Console } from "console";
+
+import {
+  enqueueRocketData,
+  dequeueRocketData,
+  printAllRocketData,
+} from "./redis/redisRocketsQueue.js";
 
 // Fix cors error, add middleware
 app.use((req, res, next) => {
@@ -135,8 +141,12 @@ rockets.forEach((rocket) => {
       thrust,
       temperature,
     };
+
+    // Save data to redis queue of specific rocket
+    enqueueRocketData(rocketTelemetryData, rocketID);
+
     // Emit rocketData to the specific rocket room
-    io.to(rocketID).emit("rocketData", rocketTelemetryData);
+    // io.to(rocketID).emit("rocketData", rocketTelemetryData);
   });
 
   TCPSocket.on("close", () => {

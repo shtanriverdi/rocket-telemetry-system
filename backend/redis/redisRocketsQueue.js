@@ -3,7 +3,7 @@
   So that we can fix the invalid data entries before we send them to frontend
 */
 // Rockets info
-import rockets from "./utils/rocketsHostInfo.js";
+import rockets from "../utils/rocketsHostInfo.js";
 
 import Redis from "ioredis";
 const redis = new Redis();
@@ -20,9 +20,12 @@ const emptyData = {
 };
 
 // Rockets data queue
-const rocketsList = rockets.map((rocketData) => rocketData.rocketID);
+const rocketsList = rockets.map((rocketData) => rocketData.id);
 // Stores specific queue for each rocket using rocket IDs
-const rocketsQueueMap = { ...rocketsList };
+const rocketsQueueMap = {};
+rocketsList.forEach((rocketID) => {
+  rocketsQueueMap[rocketID] = rocketID;
+});
 
 // Discards invalid data
 // We check the previously enqueued data and their cumulative average and see if new data is valid.
@@ -85,7 +88,7 @@ const isValidFloat = (
   return true;
 };
 
-const isDataValid = (dataToBePushed, rocketID) => {
+const isDataValid = async (dataToBePushed, rocketID) => {
   // New data to be checked
   const {
     altitudeToBeChecked,
@@ -94,9 +97,7 @@ const isDataValid = (dataToBePushed, rocketID) => {
     thrustToBeChecked,
     temperatureToBeChecked,
   } = dataToBePushed;
-
-  const currentData = retrieveAllDataFromQueue(rocketID);
-
+  const currentData = await retrieveAllDataFromQueue(rocketID);
   const curDataSumCountMap = {
     altitude: { sum: 0, count: 0, sumOfSquares: 0 },
     speed: { sum: 0, count: 0, sumOfSquares: 0 },
@@ -105,6 +106,7 @@ const isDataValid = (dataToBePushed, rocketID) => {
     temperature: { sum: 0, count: 0, sumOfSquares: 0 },
   };
 
+  // TypeError: currentData is not iterable ???? ERROR
   for (const data of currentData) {
     curDataSumCountMap.altitude.sum += data.altitude;
     curDataSumCountMap.speed.sum += data.speed;
@@ -174,6 +176,7 @@ const isDataValid = (dataToBePushed, rocketID) => {
 // Accepts first 10 data anyway for checking purposes
 // Time Comp: O(1)
 const enqueueRocketData = async (data, rocketID) => {
+  console.log("rocketsQueueMap: ", rocketsQueueMap);
   const currentQueueLen = await redis.llen(rocketsQueueMap[rocketID]);
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen >= MAX_QUEUE_LENGTH) {
@@ -181,14 +184,11 @@ const enqueueRocketData = async (data, rocketID) => {
     console.log("poppedData: ", poppedData);
   }
   // Push only if data is valid, we need at least 10 data entries
-  if (currentQueueLen <= 10 || isDataValid(data, rocketID)) {
+  const isValid = await isDataValid(data, rocketID);
+  console.log("isValid: ", isValid);
+  if (currentQueueLen <= 10 || isValid) {
     await redis.rpush(rocketsQueueMap[rocketID], JSON.stringify(data));
-    console.log(
-      "Data pushed: ",
-      poppedData,
-      rocketsQueueMap[rocketID],
-      rocketID
-    );
+    // console.log("Data pushed: ", rocketsQueueMap[rocketID], rocketID);
   }
 };
 
@@ -199,18 +199,29 @@ const dequeueRocketData = async (rocketID) => {
 };
 
 // Retrieves all items in the given rocketID's queue
-const retrieveAllDataFromQueue = (rocketID) => {
-  redis.lrange(rocketsQueueMap[rocketID], 0, -1, (err, data) => {
-    if (err) {
-      console.error("Error getting items from the queue:", err);
-    }
-    return data.map((d) => JSON.parse(d));
-  });
+const retrieveAllDataFromQueue = async (rocketID) => {
+  // console.log("rocketsQueueMap[rocketID]: ", rocketsQueueMap[rocketID], typeof rocketsQueueMap[rocketID]);
+  try {
+    const data = await redis.lrange(
+      rocketsQueueMap[rocketID],
+      0,
+      -1,
+      (err, data) => {
+        if (err) {
+          console.error("Error getting items from the queue:", err);
+        }
+      }
+    );
+    const dataList = data.map((d) => JSON.parse(d));
+    return dataList;
+  } catch (error) {
+    console.error("Error getting items from the redis queue:", error);
+  }
 };
 
-const printAllRocketData = (rocketID) => {
+const printAllRocketData = async (rocketID) => {
   // Retrieve all items in the queue
-  const data = retrieveAllDataFromQueue(rocketID);
+  const data = await retrieveAllDataFromQueue(rocketID);
   console.log("Items in the queue: ");
   data.forEach((item) => {
     console.log(item);
