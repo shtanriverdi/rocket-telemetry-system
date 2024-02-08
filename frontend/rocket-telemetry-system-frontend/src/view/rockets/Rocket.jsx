@@ -175,7 +175,7 @@ export default function Rocket({ rocketData }) {
           }
         );
 
-        if (response.status === 304) {
+        if (response.status === 304 || response.status === 400) {
           console.log("Rocket is not yet launched.");
           setShowModal(true);
           setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
@@ -207,9 +207,17 @@ export default function Rocket({ rocketData }) {
       {!showModal && <div className="h"></div>}
       {/* Modal */}
       {showModal && (
-        <div className="flex-container-outer">
+        <div className="modal-container">
           <p>
-            Rocket Already {status === "launched" ? "Launched" : "Deployed"}!
+            Rocket Already{" "}
+            {status === "launched"
+              ? "Launched"
+              : status === "deployed"
+              ? "Deployed"
+              : status === "cancelled"
+              ? "Cancelled"
+              : "Failed"}
+            !
           </p>
         </div>
       )}
