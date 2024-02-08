@@ -31,17 +31,13 @@ const io = new Server(server, {
 
 // Import redis functions
 import {
-  redis,
   enqueueWeatherData,
   dequeueWeatherData,
-  printAllData,
 } from "./redis/redisWeatherQueue.js";
 
 import {
   enqueueRocketData,
   dequeueRocketData,
-  printAllRocketDataAsJSON,
-  printAllRocketDataAsString,
 } from "./redis/redisRocketsQueue.js";
 
 // Fix cors error, add middleware
@@ -125,15 +121,6 @@ rockets.forEach((rocket) => {
     console.log(`Socket.io connected for rocket: ${id}`);
   });
 
-  // rocketNamespace.on("disconnect", () => {
-  //   console.log("Rocket namespace disconnected:", id);
-  // });
-
-  // Add the rocket ID to the rocketNamespace object for reference
-  // rocketNamespace.rocketID = id;
-
-  // rocketNamespace.emit("rocketData", );
-
   // Establish the connection
   TCPSocket.connect(port, host, () => {
     console.log(`Connected via TCP for rocket: ${id}`);
@@ -170,80 +157,10 @@ rockets.forEach((rocket) => {
   TCPSocket.on("error", (err) => {
     console.error(`Socket/TCP Error: ${err.message}`);
   });
-
-  // Create a socket.io room for each rocket
-  // io.of(`/rockets/${id}`).on("connection", (socket) => {
-  //   console.log(`Socket.io connected for rocket: ${id}`);
-  // });
-
-  // Create a socket.io room for each rocket
-  // io.on("connection", (socket) => {
-  //   console.log(`Socket.io connected for rocket: ${id}`);
-  //   socket.join(id);
-  // });
-
-  // Closes the TCP connection
-  // TCPSocket.destroy();
 });
 
-// // Creates a TCP connection and socket for given rocket
-// function runRocketTCPSocket(id, host, port) {
-//   // Creates and stores new TCP Socket for a given rocket
-//   const TCPSocket = new net.Socket();
-//   app.set(id, TCPSocket);
-//   console.log("app.get(id):", app.get(id));
-
-//   // Establish the connection
-//   TCPSocket.connect(port, host, () => {
-//     console.log(`Connected via TCP for rocket: ${id}`);
-//   });
-
-//   // When data is received
-//   TCPSocket.on("data", (bufferData) => {
-//     const rocketData = bufferToJson(bufferData);
-//     const rocketID = rocketData.rocketID;
-//     console.log(rocketData);
-//     // Emit rocketData to the specific rocket room
-//     io.to(rocketID).emit("rocketData", rocketData);
-//   });
-
-//   TCPSocket.on("close", () => {
-//     console.log(`TCP connection ended for rocket: ${id}`);
-//   });
-
-//   // Error
-//   TCPSocket.on("error", (err) => {
-//     console.error(`Socket/TCP Error: ${err.message}`);
-//   });
-
-//   // Create a socket.io room for each rocket
-//   io.on("connection", (socket) => {
-//     console.log(`Socket.io connected for rocket: ${id}`);
-//     socket.join(id);
-//   });
-// }
-
-// function stopRocketSocket(rocketId) {}
-
-// // Rockets middlewares { status: "on" | "off" }
-// app.get("/rockets/:rocketId/:status", (req, res) => {
-//   const rocketId = req.params.rocketId;
-//   const status = req.params.status;
-//   let response = "empty";
-//   console.log("rocketId:", rocketId, " status:", status);
-//   if (status === "on") {
-//     runRocketSocket(rocketId);
-//     response = "connected";
-//   } else if (status === "off") {
-//     stopRocketSocket(rocketId);
-//     response = "disconnected";
-//   }
-//   // Set the response in the JSON object
-//   res.json({ response });
-// });
 
 // ------------------------ Express --------------------------
-
 // Starts the server
 server.listen(port, () => {
   console.log(`Rocket Server is up and running on port ${port}`);

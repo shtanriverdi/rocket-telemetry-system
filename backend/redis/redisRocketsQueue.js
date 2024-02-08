@@ -89,14 +89,6 @@ const isValidFloat = (
 };
 
 const isDataValid = async (dataToBePushed, rocketID) => {
-  // New data to be checked
-  const {
-    altitudeToBeChecked,
-    speedToBeChecked,
-    accelerationToBeChecked,
-    thrustToBeChecked,
-    temperatureToBeChecked,
-  } = dataToBePushed;
   const currentData = await retrieveAllDataFromQueue(rocketID, true);
   const curDataSumCountMap = {
     altitude: { sum: 0, count: 0, sumOfSquares: 0 },

@@ -56,8 +56,6 @@ const enqueueWeatherData = async (data) => {
     // Update last recent data, deep copy
     lastRecentWeatherData = { ...data };
     // console.log("lastRecentWeatherData", lastRecentWeatherData);
-    // console.log("Added data into the queue: ", data);
-    // console.log("Added data into the queue.\n");
   } catch (error) {
     console.log("error enqueue: ", error, "\n");
   }
