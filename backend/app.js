@@ -78,7 +78,7 @@ function stopWeatherSocket() {
 // Data storing frequency on redis
 function runWeatherSocket() {
   const weatherRedisInterval = setInterval(async () => {
-    console.log("Redis enqueueing...");
+    // console.log("Redis enqueueing...");
     const { data: weatherData } = await getWeatherData();
     // console.log("Weather data: ", weatherData);
     await enqueueWeatherData(weatherData);

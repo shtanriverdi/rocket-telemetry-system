@@ -20,12 +20,12 @@ async function fetchData(attemps, path) {
     const data = await instance.get(path);
     return data;
   } catch (error) {
-    console.error(
-      "Error occured!",
-      // error.request,
-      "Get Request Attemps:",
-      attemps
-    );
+    // console.error(
+    //   "Error occured!",
+    //   // error.request,
+    //   "Get Request Attemps:",
+    //   attemps
+    // );
   }
 
   return false;

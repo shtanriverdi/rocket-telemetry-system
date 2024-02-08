@@ -43,6 +43,9 @@ export default function Rocket({ rocketData }) {
   const [isRocketActionInProgress, setIsRocketActionInProgress] =
     useState(false);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+
   const handleSocketConnection = () => {
     if (isRocketConnected === 0) {
       setRocketConnected(1);
@@ -120,6 +123,8 @@ export default function Rocket({ rocketData }) {
 
         if (response.status === 304) {
           console.log("Rocket is already launched.");
+          setShowModal(true);
+          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
         }
         // setRocketState((prevState) => ({ ...prevState, status: "launched" }));
       });
@@ -145,6 +150,8 @@ export default function Rocket({ rocketData }) {
 
         if (response.status === 304) {
           console.log("Rocket is already deployed.");
+          setShowModal(true);
+          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
         }
         // setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
       });
@@ -170,6 +177,8 @@ export default function Rocket({ rocketData }) {
 
         if (response.status === 304) {
           console.log("Rocket is not yet launched.");
+          setShowModal(true);
+          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
         }
         // setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
       });
@@ -194,114 +203,124 @@ export default function Rocket({ rocketData }) {
   }
 
   return (
-    <div
-      className="rocket-container ps"
-      style={{ backgroundColor: getStatusColor(status) }}>
-      <div className="flex-container-outer">
-        <div className="m-bs flex-container-centerize">
+    <div>
+      {!showModal && <div className="h"></div>}
+      {/* Modal */}
+      {showModal && (
+        <div className="flex-container-outer">
           <p>
-            Connection:&nbsp;
-          </p>
-          <p
-            className="inline-block bold"
-            style={{
-              color:
-                isRocketConnected === 0
-                  ? "red"
-                  : isRocketConnected === 1
-                  ? "gray"
-                  : "green",
-            }}>
-            {isRocketConnected === 0 && "Disconnected"}
-            {isRocketConnected === 1 && "Connecting..."}
-            {isRocketConnected === 2 && "Connected"}&nbsp;
+            Rocket Already {status === "launched" ? "Launched" : "Deployed"}!
           </p>
         </div>
-        <p className="text-center m-b">
-          <b>Rocket: </b>
-          {id}&nbsp;&nbsp;
-        </p>
-        <button
-          disabled={isRocketConnected === 1}
-          onClick={handleSocketConnection}>
-          {isRocketConnected === 0 && "Connect"}
-          {isRocketConnected === 1 && "Connecting"}
-          {isRocketConnected === 2 && "Disconnect"}
-        </button>
-      </div>
-      <div className="m-b">
-        <p>
-          <b>Payload:</b> {payload.description}
-        </p>
-        <p>
-          <b>Weight:</b> {payload.weight}
-        </p>
-        <div className="no-bullet">
-          <li>
-            <b>Model:</b> {model}
-          </li>
-          <li>
-            <b>Mass:</b> {mass}
-          </li>
+      )}
+      <div
+        className="rocket-container ps"
+        style={{ backgroundColor: getStatusColor(status) }}>
+        <div className="flex-container-outer">
+          <div className="m-bs flex-container-centerize">
+            <p>Connection:&nbsp;</p>
+            <p
+              className="inline-block bold"
+              style={{
+                color:
+                  isRocketConnected === 0
+                    ? "red"
+                    : isRocketConnected === 1
+                    ? "gray"
+                    : "green",
+              }}>
+              {isRocketConnected === 0 && "Disconnected"}
+              {isRocketConnected === 1 && "Connecting..."}
+              {isRocketConnected === 2 && "Connected"}&nbsp;
+            </p>
+          </div>
+          <p className="text-center m-b">
+            <b>Rocket: </b>
+            {id}&nbsp;&nbsp;
+          </p>
+          <button
+            disabled={isRocketConnected === 1}
+            onClick={handleSocketConnection}>
+            {isRocketConnected === 0 && "Connect"}
+            {isRocketConnected === 1 && "Connecting"}
+            {isRocketConnected === 2 && "Disconnect"}
+          </button>
         </div>
-      </div>
-
-      <div className="tele-container no-bullet">
         <div className="m-b">
-          <li className="bold underline m-r">Telemetry Data</li>
-          <li>Altitude: {telemetryState.altitude}</li>
-          <li>Speed: {telemetryState.speed}</li>
-          <li>Acceleration: {telemetryState.acceleration}</li>
-          <li>Thrust: {telemetryState.thrust}</li>
-          <li>Temperature: {telemetryState.temperature}</li>
+          <p>
+            <b>Payload:</b> {payload.description}
+          </p>
+          <p>
+            <b>Weight:</b> {payload.weight}
+          </p>
+          <div className="no-bullet">
+            <li>
+              <b>Model:</b> {model}
+            </li>
+            <li>
+              <b>Mass:</b> {mass}
+            </li>
+          </div>
         </div>
-        <div>
-          <li className="bold underline">Timestamps</li>
-          <li>launched: {timestamps.launched ?? "-"}</li>
-          <li>deployed: {timestamps.deployed ?? "-"}</li>
-          <li>failed: {timestamps.failed ?? "-"}</li>
-          <li>cancelled: {timestamps.cancelled ?? "-"}</li>
+
+        <div className="tele-container no-bullet">
+          <div className="m-b">
+            <li className="bold underline m-r">Telemetry Data</li>
+            <li>Altitude: {telemetryState.altitude}</li>
+            <li>Speed: {telemetryState.speed}</li>
+            <li>Acceleration: {telemetryState.acceleration}</li>
+            <li>Thrust: {telemetryState.thrust}</li>
+            <li>Temperature: {telemetryState.temperature}</li>
+          </div>
+          <div>
+            <li className="bold underline">Timestamps</li>
+            <li>launched: {timestamps.launched ?? "-"}</li>
+            <li>deployed: {timestamps.deployed ?? "-"}</li>
+            <li>failed: {timestamps.failed ?? "-"}</li>
+            <li>cancelled: {timestamps.cancelled ?? "-"}</li>
+          </div>
         </div>
-      </div>
-      <p className="m-t m-b">
-        <b>Rocket Status:</b>{" "}
-        <span className="bold"
-          style={{
-            textTransform: "uppercase",
-            color:
-              status === "launched"
-                ? "green"
-                : status === "deployed"
-                ? "purple"
-                : status === "cancelled"
-                ? "gray"
-                : status === "waiting"
-                ? "orange"
-                : "red",
-          }}>
-          {status}
-        </span>
-        <li className="no-bullet">
-          <b>Host/Port:</b> {host + ":" + port}
-        </li>
-      </p>
-      <div className="flex-container">
-        <button
-          disabled={isRocketConnected === 0 || isRocketActionInProgress}
-          onClick={launchRocket}>
-          Launch
-        </button>
-        <button
-          disabled={isRocketConnected === 0 || isRocketActionInProgress}
-          className="m-x"
-          onClick={cancelRocket}>
-          Cancel
-        </button>
-        <button
-          disabled={isRocketConnected === 0 || isRocketActionInProgress}
-          onClick={deployRocket}>
-          Deploy
-        </button>
+        <p className="m-t m-b">
+          <b>Rocket Status:</b>{" "}
+          <span
+            className="bold"
+            style={{
+              textTransform: "uppercase",
+              color:
+                status === "launched"
+                  ? "green"
+                  : status === "deployed"
+                  ? "purple"
+                  : status === "cancelled"
+                  ? "gray"
+                  : status === "waiting"
+                  ? "orange"
+                  : "red",
+            }}>
+            {status}
+          </span>
+          <li className="no-bullet">
+            <b>Host/Port:</b> {host + ":" + port}
+          </li>
+        </p>
+        <div className="flex-container">
+          <button
+            disabled={isRocketConnected === 0 || isRocketActionInProgress}
+            onClick={launchRocket}>
+            Launch
+          </button>
+          <button
+            disabled={isRocketConnected === 0 || isRocketActionInProgress}
+            className="m-x"
+            onClick={cancelRocket}>
+            Cancel
+          </button>
+          <button
+            disabled={isRocketConnected === 0 || isRocketActionInProgress}
+            onClick={deployRocket}>
+            Deploy
+          </button>
+        </div>
       </div>
     </div>
   );
