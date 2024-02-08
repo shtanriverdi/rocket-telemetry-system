@@ -2,7 +2,10 @@
 
 https://github.com/shtanriverdi/rocket-telemetry-system/assets/36234545/afb9ddbf-2f11-4372-9813-f287b7cb69ef
 
-# Rocket Launch Control Application
+## Description
+This project involves developing a command control application for a newly established rocket launch station. The application must provide users with an interface to view the current status of rockets in the field in real-time and enable control of selected rockets through provided components.
+
+Additionally, users should be able to access real-time weather conditions via the interface to inform launch decisions based on environmental parameters.
 
 ## Running the Backend Application
 To run the application, ensure that the latest version of Docker is installed on your system. Once Docker is confirmed to be running, execute the following command to run the application:
@@ -24,18 +27,13 @@ Import the provided Postman collection (`Launch Site.postman_collection.json`) a
 - The rocket telemetry systems have a 10% chance of sending "faulty data."
 - Real-time data from rocket telemetry systems is sent at 100 ms intervals.
 
-## Description
-This project involves developing a command control application for a newly established rocket launch station. The application must provide users with an interface to view the current status of rockets in the field in real-time and enable control of selected rockets through provided components.
-
-Additionally, users should be able to access real-time weather conditions via the interface to inform launch decisions based on environmental parameters.
-
 ### User Stories
 - As a user, I should be able to view all rockets in the field with their respective information.
 - As a user, I should be able to monitor the telemetry data and status of rockets in real-time.
 - As a user, I should be able to view the cargo content carried by each rocket.
 - As a user, I should be able to view the connection status of telemetry systems associated with each rocket.
 - As a user, I should be able to launch each rocket through the interface.
-- As a user, I should be able to monitor the current weather conditions in real-time.
+- As a user, I should be able to monitor the current weather conditions in real time.
 
 ## Development
 The application communicates with the provided backend application to fulfill the user stories outlined above. The backend exposes a REST API for retrieving rocket information and weather data. Additionally, each rocket has a telemetry service accessible via TCP for real-time data.
@@ -64,9 +62,6 @@ To run and test the application, you need:
 - Docker: Required for running the backend application.
 - Postman: Used for testing REST API endpoints and accessing documentation.
 
-## Deployment
-Once development is complete, you can share the source code and any accompanying documentation via a public repository on a Git hosting service such as GitHub or GitLab.
-
 ## Evaluation
 The submitted source code will be evaluated based on the following criteria:
 - Implementation of technical requirements.
@@ -76,3 +71,7 @@ The submitted source code will be evaluated based on the following criteria:
 - Unit testing.
 - Performance considerations.
 - Number of implemented user scenarios.
+
+## Rocket Telemetry System Protocol
+![image](https://github.com/shtanriverdi/rocket-telemetry-system/assets/36234545/5bfe4586-e37b-47e0-b3f0-d08adfdcfb7f)
+
