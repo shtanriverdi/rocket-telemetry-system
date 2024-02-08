@@ -104,7 +104,7 @@ export default function Weather() {
       </div>
       <div className="status-container m-b m">
         <div>
-          <p className="m-x">
+          <p className="m-x bold">
             Connection:{" "}
             <span
               style={{
