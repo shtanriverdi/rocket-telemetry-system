@@ -90,6 +90,7 @@ export default function Weather() {
         socket.disconnect();
         socket.off("weatherData");
         setIsConnected(0);
+        setShouldLaunch(false);
       });
     };
 
