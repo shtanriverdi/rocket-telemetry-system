@@ -2,6 +2,119 @@ import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 
 const ROCKETS_URL = "http://localhost:3000";
+const headers = new Headers();
+headers.append("x-api-key", "API_KEY_1");
+headers.append("Connection", "keepalive");
+headers.append("Accept-Encoding", "gzip, deflate, br");
+headers.append("Accept", "*/*");
+headers.append("User-Agent", "PostmanRuntime/7.36.1");
+headers.append("Content-Length", "0");
+headers.append("Postman-Token", "<calculated when request is sent>");
+
+/*
+  Launch Rocket, PUT Request:
+  http://localhost:5000/rocket/DSSvW7VLmb/status/launched
+  Response:
+  If launched: 304 NOT MODIFIED
+  If not launched:
+  {
+      "id": "DSSvW7VLmb",
+      "model": "Saturn V",
+      "mass": 2970000,
+      "payload": {
+          "description": "Apollo CSM-109 Odyssey, Apollo LM-7 Aquarius, 3 Astronauts",
+          "weight": 1542
+      },
+      "telemetry": {
+          "host": "0.0.0.0",
+          "port": 4000
+      },
+      "status": "launched",
+      "timestamps": {
+          "launched": "2024-02-08T05:48:29.012781",
+          "deployed": null,
+          "failed": null,
+          "cancelled": null
+      },
+      "altitude": 0.0,
+      "speed": 0.0,
+      "acceleration": 0.0,
+      "thrust": 35100000,
+      "temperature": 0.0
+  }
+
+
+  Deploy Rocket, PUT Request:
+  http://localhost:5000/rocket/FvxKSGLkVC/status/deployed
+  Response:
+  If deployed: 304 NOT MODIFIED
+  If not deployed:
+  {
+      "id": "DSSvW7VLmb",
+      "model": "Saturn V",
+      "mass": 2970000,
+      "payload": {
+          "description": "Apollo CSM-109 Odyssey, Apollo LM-7 Aquarius, 3 Astronauts",
+          "weight": 1542
+      },
+      "telemetry": {
+          "host": "0.0.0.0",
+          "port": 4000
+      },
+      "status": "launched",
+      "timestamps": {
+          "launched": "2024-02-08T05:48:29.012781",
+          "deployed": "2024-02-08T06:55:22.012781",
+          "failed": null,
+          "cancelled": null
+      },
+      "altitude": 0.0,
+      "speed": 0.0,
+      "acceleration": 0.0,
+      "thrust": 35100000,
+      "temperature": 0.0
+  }
+
+
+
+  Cancel Rocket, DEL Request:
+  http://localhost:5000/rocket/FvxKSGLkVC/status/launched
+  Response:
+  If not launched:
+  {
+    "code": 400,
+    "message": "Rocket DSSvW7VLmb is not launched yet.",
+    "key": "bad_request",
+    "payload": null
+  }
+
+  If not launched:
+  {
+      "id": "DSSvW7VLmb",
+      "model": "Saturn V",
+      "mass": 2970000,
+      "payload": {
+          "description": "Apollo CSM-109 Odyssey, Apollo LM-7 Aquarius, 3 Astronauts",
+          "weight": 1542
+      },
+      "telemetry": {
+          "host": "0.0.0.0",
+          "port": 4000
+      },
+      "status": "launched",
+      "timestamps": {
+          "launched": "2024-02-08T05:48:29.012781",
+          "deployed": null,
+          "failed": null,
+          "cancelled": "2024-02-08T06:55:22.012781"
+      },
+      "altitude": 0.0,
+      "speed": 0.0,
+      "acceleration": 0.0,
+      "thrust": 35100000,
+      "temperature": 0.0
+  }
+*/
 
 export default function Rocket({ rocketData }) {
   // Socket.io server address, autoconnect is off
@@ -55,16 +168,17 @@ export default function Rocket({ rocketData }) {
     socket.on("connect", () => {
       console.log("Socket.io connected for Rocket: ", id);
       setRocketConnected(2);
-      socket.on("disconnect", () => {
-        console.log("On disconnect for Rocket: ", id);
-        // socket.off("rocketData");
-        socket.disconnect();
-        setRocketConnected(0);
-      });
+    });
+    
+    socket.on("disconnect", () => {
+      console.log("On disconnect for Rocket: ", id);
+      // socket.off("rocketData");
+      socket.disconnect();
+      setRocketConnected(0);
     });
 
     socket.on("rocketData", (data) => {
-      console.log(`Roket data received (${id}):`, data);
+      // console.log(`Roket data received (${id}):`, data);
       setTelemetryState(data);
     });
 
@@ -78,6 +192,102 @@ export default function Rocket({ rocketData }) {
       setRocketConnected(0);
     });
   }, [isRocketConnected]);
+
+  // Handles the states of a rocket: launched, deployed, canceled
+  // postfix: "launched", "deployed" or "cancelled" ?
+  // method: "PUT" or "DEL"
+  // const handleRocket = async (postfix, method) => {
+  //   try {
+  //     const headers = new Headers();
+  //     headers.append("x-api-key", "API_KEY_1");
+
+  //     const response = await fetch(
+  //       `http://localhost:5000/rocket/${rocketData.id}/status/launched`,
+  //       {
+  //         method: "PUT",
+  //         headers: headers,
+  //         redirect: "follow",
+  //       }
+  //     );
+
+  //     if (response.status === 304) {
+  //       console.log("Roket zaten başlatılmış.");
+  //     } else {
+  //       setRocketState((prevState) => ({ ...prevState, status: "launched" }));
+  //     }
+  //   } catch (error) {
+  //     console.error("Roket başlatılırken bir hata oluştu:", error);
+  //   }
+  // };
+
+  const launchRocket = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/rocket/${id}/status/launched`,
+        {
+          method: "PUT",
+          headers: headers,
+          redirect: "follow",
+        }
+      );
+
+      if (response.status === 304) {
+        // Rocket is already launched
+        console.log("Rocket is already launched.");
+      } else {
+        // Rocket launched successfully, update the status
+        setRocketState((prevState) => ({ ...prevState, status: "launched" }));
+      }
+    } catch (error) {
+      console.error("An error occurred while launching the rocket:", error);
+    }
+  };
+
+  const deployRocket = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/rocket/${id}/status/deployed`,
+        {
+          method: "PUT",
+          headers: headers,
+          redirect: "follow",
+        }
+      );
+
+      if (response.status === 304) {
+        // Rocket is already deployed
+        console.log("Rocket is already deployed.");
+      } else {
+        // Rocket deployed successfully, update the status
+        setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
+      }
+    } catch (error) {
+      console.error("An error occurred while deploying the rocket:", error);
+    }
+  };
+
+  const cancelRocket = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/rocket/${id}/status/launched`,
+        {
+          method: "DELETE",
+          headers: headers,
+          redirect: "follow",
+        }
+      );
+
+      if (response.status === 304) {
+        // Rocket is not yet launched
+        console.log("Rocket is not yet launched.");
+      } else {
+        // Rocket canceled successfully, update the status
+        setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
+      }
+    } catch (error) {
+      console.error("An error occurred while canceling the rocket:", error);
+    }
+  };
 
   return (
     <div className="rocket-container p">
@@ -154,10 +364,18 @@ export default function Rocket({ rocketData }) {
         </li>
       </p>
       <div className="flex-container">
-        <button disabled={isRocketConnected === 0} className="m-r">
+        <button disabled={isRocketConnected === 0} onClick={launchRocket}>
           Launch
         </button>
-        <button disabled={isRocketConnected === 0}>Cancel</button>
+        <button
+          disabled={isRocketConnected === 0}
+          className="m-x"
+          onClick={cancelRocket}>
+          Cancel
+        </button>
+        <button disabled={isRocketConnected === 0} onClick={deployRocket}>
+          Deploy
+        </button>
       </div>
     </div>
   );
