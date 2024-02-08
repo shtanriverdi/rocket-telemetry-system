@@ -43,38 +43,49 @@ export default function Rocket({ rocketData }) {
     if (isRocketConnected === 0) {
       setRocketConnected(1);
       socket.connect();
-      if (socket.connected) {
+
+      socket.on("connect", () => {
+        console.log("Socket.io connected for Rocket: ", id);
         setRocketConnected(2);
-      } else {
+      });
+
+      socket.on("connect_error", (error) => {
+        console.error("Socket.io connection error:", error);
+        socket.disconnect();
         setRocketConnected(0);
-      }
+      });
     } else if (isRocketConnected === 2) {
       socket.disconnect();
       setRocketConnected(0);
+      socket.on("disconnect", () => {
+        console.log("On disconnect for Rocket: ", id);
+        socket.disconnect();
+        setRocketConnected(0);
+      });
     }
   };
 
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Socket.io connected for Rocket: ", id);
-      setRocketConnected(2);
-    });
+    // socket.on("connect", () => {
+    //   console.log("Socket.io connected for Rocket: ", id);
+    //   setRocketConnected(2);
+    // });
 
-    socket.on("disconnect", () => {
-      console.log("On disconnect for Rocket: ", id);
-      socket.disconnect();
-      setRocketConnected(0);
-    });
+    // socket.on("disconnect", () => {
+    //   console.log("On disconnect for Rocket: ", id);
+    //   socket.disconnect();
+    //   setRocketConnected(0);
+    // });
 
     socket.on("rocketData", (data) => {
       setTelemetryState(data);
     });
 
-    socket.on("connect_error", (error) => {
-      console.error("Socket.io connection error:", error);
-      socket.disconnect();
-      setRocketConnected(0);
-    });
+    // socket.on("connect_error", (error) => {
+    //   console.error("Socket.io connection error:", error);
+    //   socket.disconnect();
+    //   setRocketConnected(0);
+    // });
   }, [isRocketConnected]);
 
   const performWithRetry = async (operation, retryCount = 0) => {
@@ -228,7 +239,22 @@ export default function Rocket({ rocketData }) {
         </div>
       </div>
       <p className="m-t m-b">
-        <b>Rocket Status:</b> {status}
+        <b>Rocket Status:</b>{" "}
+        <span
+          style={{
+            color:
+              status === "launched"
+                ? "green"
+                : status === "deployed"
+                ? "purple"
+                : status === "cancelled"
+                ? "gray"
+                : status === "waiting"
+                ? "orange"
+                : "red",
+          }}>
+          {status}
+        </span>
         <li className="no-bullet">
           <b>Host/Port:</b> {host + ":" + port}
         </li>
