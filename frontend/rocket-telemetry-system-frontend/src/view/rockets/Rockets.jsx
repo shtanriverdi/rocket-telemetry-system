@@ -37,10 +37,11 @@ export default function Rockets() {
           // console.log("data:", data);
           setRocketsState(data);
         } else {
-          throw new Error("Service unavailable");
+          // throw new Error("Service unavailable");
+          // console.error("Service unavailable");
         }
       } catch (error) {
-        console.error("Fetch error:", error);
+        // console.error("Fetch error:", error);
         if (retries < 100) {
           setTimeout(fetchData, 2400);
           retries++;

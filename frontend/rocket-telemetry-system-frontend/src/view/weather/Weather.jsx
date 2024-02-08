@@ -93,7 +93,7 @@ export default function Weather() {
   }, [isConnected]);
 
   return (
-    <div className="outer-container flex-col m">
+    <div className="outer-container flex-col">
       <div className="flex-container">
         <WeatherIcon />
         <h1 className="text-center m-t">&nbsp;Weather Forecast</h1>

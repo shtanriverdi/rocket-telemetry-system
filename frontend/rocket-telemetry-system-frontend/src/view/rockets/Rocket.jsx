@@ -171,7 +171,7 @@ export default function Rocket({ rocketData }) {
   };
 
   return (
-    <div className="rocket-container p">
+    <div className="rocket-container ps">
       <div className="flex-container-outer">
         <div className="m-bs flex-container-centerize">
           <p>
