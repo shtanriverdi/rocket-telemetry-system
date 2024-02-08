@@ -45,6 +45,19 @@ export default function Rocket({ rocketData }) {
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const handleResponse = (response) => {
+    if (response.status >= 200 && response.status < 300) {
+      setModalMessage("Rocket operation successful!");
+    } else if (response.status === 304) {
+      setModalMessage("Rocket operation already performed!");
+    } else if (response.status >= 400 && response.status < 600) {
+      setModalMessage("Connection error!");
+    }
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 3000);
+  };
 
   const handleSocketConnection = () => {
     if (isRocketConnected === 0) {
@@ -120,13 +133,7 @@ export default function Rocket({ rocketData }) {
             redirect: "follow",
           }
         );
-
-        if (response.status === 304) {
-          console.log("Rocket is already launched.");
-          setShowModal(true);
-          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
-        }
-        // setRocketState((prevState) => ({ ...prevState, status: "launched" }));
+        handleResponse(response);
       });
     } catch (error) {
       console.error("An error occurred while launching the rocket:", error);
@@ -147,13 +154,7 @@ export default function Rocket({ rocketData }) {
             redirect: "follow",
           }
         );
-
-        if (response.status === 304) {
-          console.log("Rocket is already deployed.");
-          setShowModal(true);
-          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
-        }
-        // setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
+        handleResponse(response);
       });
     } catch (error) {
       console.error("An error occurred while deploying the rocket:", error);
@@ -174,13 +175,7 @@ export default function Rocket({ rocketData }) {
             redirect: "follow",
           }
         );
-
-        if (response.status === 304 || response.status === 400) {
-          console.log("Rocket is not yet launched.");
-          setShowModal(true);
-          setTimeout(() => setShowModal(false), 3000); // Close modal after 3 seconds
-        }
-        // setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
+        handleResponse(response);
       });
     } catch (error) {
       console.error("An error occurred while canceling the rocket:", error);
@@ -208,17 +203,7 @@ export default function Rocket({ rocketData }) {
       {/* Modal */}
       {showModal && (
         <div className="modal-container">
-          <p>
-            Rocket Already{" "}
-            {status === "launched"
-              ? "Launched"
-              : status === "deployed"
-              ? "Deployed"
-              : status === "cancelled"
-              ? "Cancelled"
-              : "Failed"}
-            !
-          </p>
+          <p>{modalMessage}</p>
         </div>
       )}
       <div
