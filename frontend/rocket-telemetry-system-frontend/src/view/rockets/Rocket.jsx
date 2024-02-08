@@ -55,6 +55,10 @@ export default function Rocket({ rocketData }) {
     } else if (response.status >= 400 && response.status < 600) {
       setModalMessage("Connection error!");
     }
+    handleSetModal();
+  };
+
+  const handleSetModal = () => {
     setShowModal(true);
     setTimeout(() => setShowModal(false), 3000);
   };
@@ -67,45 +71,37 @@ export default function Rocket({ rocketData }) {
       socket.on("connect", () => {
         console.log("Socket.io connected for Rocket: ", id);
         setRocketConnected(2);
+        setModalMessage("Rocket connected to TCP Server!");
+        handleSetModal();
       });
 
       socket.on("connect_error", (error) => {
         console.error("Socket.io connection error:", error);
         socket.disconnect();
+        setModalMessage("Rocket connection failed!");
+        handleSetModal();
         setRocketConnected(0);
       });
     } else if (isRocketConnected === 2) {
       socket.disconnect();
       setRocketConnected(0);
+      setModalMessage("Rocket disconnected");
+      handleSetModal();
       socket.on("disconnect", () => {
         console.log("On disconnect for Rocket: ", id);
+        setModalMessage("Rocket disconnected");
+        handleSetModal();
         socket.disconnect();
         setRocketConnected(0);
       });
     }
   };
 
+  // Fetches the data from the socket
   useEffect(() => {
-    // socket.on("connect", () => {
-    //   console.log("Socket.io connected for Rocket: ", id);
-    //   setRocketConnected(2);
-    // });
-
-    // socket.on("disconnect", () => {
-    //   console.log("On disconnect for Rocket: ", id);
-    //   socket.disconnect();
-    //   setRocketConnected(0);
-    // });
-
     socket.on("rocketData", (data) => {
       setTelemetryState(data);
     });
-
-    // socket.on("connect_error", (error) => {
-    //   console.error("Socket.io connection error:", error);
-    //   socket.disconnect();
-    //   setRocketConnected(0);
-    // });
   }, [isRocketConnected]);
 
   const performWithRetry = async (operation, retryCount = 0) => {
