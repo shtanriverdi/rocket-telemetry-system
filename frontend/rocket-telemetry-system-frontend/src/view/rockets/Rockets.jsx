@@ -55,11 +55,11 @@ export default function Rockets() {
 
   return (
     <>
-      <div className="flex-container m">
+      <div className="flex-container m-t">
         <RocketIcon />
         <h1>&nbsp;Rockets</h1>
       </div>
-      <div className="grid-list m m-bxxl">{rocketsListItems}</div>
+      <div className="grid-list m-bxxxl">{rocketsListItems}</div>
     </>
   );
 }
