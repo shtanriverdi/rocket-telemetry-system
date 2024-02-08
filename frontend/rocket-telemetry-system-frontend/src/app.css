@@ -65,7 +65,7 @@
 .rocket-container {
   display: flex;
   flex-direction: column;
-  width: 22rem;
+  width: 20rem;
   justify-content: flex-start;
   flex-wrap: wrap;
   border-radius: 1.5rem;

@@ -34,11 +34,10 @@ export default function Rockets() {
         });
         if (response.ok) {
           const data = await response.json();
-          // console.log("data:", data);
+          console.log("data:", data);
           setRocketsState(data);
         } else {
-          // throw new Error("Service unavailable");
-          // console.error("Service unavailable");
+          throw new Error("Service unavailable");
         }
       } catch (error) {
         // console.error("Fetch error:", error);

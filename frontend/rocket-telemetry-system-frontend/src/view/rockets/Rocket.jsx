@@ -39,6 +39,10 @@ export default function Rocket({ rocketData }) {
 
   const [isRocketConnected, setRocketConnected] = useState(0);
 
+  // Control launch, deploy & cancel buttons
+  const [isRocketActionInProgress, setIsRocketActionInProgress] =
+    useState(false);
+
   const handleSocketConnection = () => {
     if (isRocketConnected === 0) {
       setRocketConnected(1);
@@ -103,6 +107,7 @@ export default function Rocket({ rocketData }) {
 
   const launchRocket = async () => {
     try {
+      setIsRocketActionInProgress(true);
       await performWithRetry(async () => {
         const response = await fetch(
           `http://localhost:5000/rocket/${id}/status/launched`,
@@ -116,16 +121,18 @@ export default function Rocket({ rocketData }) {
         if (response.status === 304) {
           console.log("Rocket is already launched.");
         }
-
         // setRocketState((prevState) => ({ ...prevState, status: "launched" }));
       });
     } catch (error) {
       console.error("An error occurred while launching the rocket:", error);
+    } finally {
+      setIsRocketActionInProgress(false);
     }
   };
 
   const deployRocket = async () => {
     try {
+      setIsRocketActionInProgress(true);
       await performWithRetry(async () => {
         const response = await fetch(
           `http://localhost:5000/rocket/${id}/status/deployed`,
@@ -139,16 +146,18 @@ export default function Rocket({ rocketData }) {
         if (response.status === 304) {
           console.log("Rocket is already deployed.");
         }
-
         // setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
       });
     } catch (error) {
       console.error("An error occurred while deploying the rocket:", error);
+    } finally {
+      setIsRocketActionInProgress(false);
     }
   };
 
   const cancelRocket = async () => {
     try {
+      setIsRocketActionInProgress(true);
       await performWithRetry(async () => {
         const response = await fetch(
           `http://localhost:5000/rocket/${id}/status/launched`,
@@ -162,11 +171,12 @@ export default function Rocket({ rocketData }) {
         if (response.status === 304) {
           console.log("Rocket is not yet launched.");
         }
-
         // setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
       });
     } catch (error) {
       console.error("An error occurred while canceling the rocket:", error);
+    } finally {
+      setIsRocketActionInProgress(false);
     }
   };
 
@@ -260,16 +270,20 @@ export default function Rocket({ rocketData }) {
         </li>
       </p>
       <div className="flex-container">
-        <button disabled={isRocketConnected === 0} onClick={launchRocket}>
+        <button
+          disabled={isRocketConnected === 0 || isRocketActionInProgress}
+          onClick={launchRocket}>
           Launch
         </button>
         <button
-          disabled={isRocketConnected === 0}
+          disabled={isRocketConnected === 0 || isRocketActionInProgress}
           className="m-x"
           onClick={cancelRocket}>
           Cancel
         </button>
-        <button disabled={isRocketConnected === 0} onClick={deployRocket}>
+        <button
+          disabled={isRocketConnected === 0 || isRocketActionInProgress}
+          onClick={deployRocket}>
           Deploy
         </button>
       </div>
