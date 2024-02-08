@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { formatTime } from "../../utils/formatTime";
 import WeatherIcon from "./WeatherIcon";
+import isLaunchable from "./isLaunchable";
 
 const WEATHER_URL = "http://localhost:3000/weather";
 
@@ -34,6 +35,8 @@ export default function Weather() {
       speed: 0,
     },
   });
+
+  const [shouldLaunch, setShouldLaunch] = useState(false);
 
   const stopConnection = async () => {
     await fetch(WEATHER_URL + "/off");
@@ -79,6 +82,7 @@ export default function Weather() {
     const runFethingData = async () => {
       socket.on("weatherData", (data) => {
         setWeatherData(data);
+        setShouldLaunch(isLaunchable(weatherData));
       });
 
       socket.on("disconnect", () => {
@@ -134,6 +138,16 @@ export default function Weather() {
           }}>
           Reset System
         </button>
+      </div>
+      <div className="m-b">
+        <span className="bold">Rocket Launching Recommendation: </span>
+        <span
+          className="bold"
+          style={{
+            color: shouldLaunch ? "green" : "red",
+          }}>
+          {shouldLaunch ? "Launchable" : "Not Recommended"}
+        </span>
       </div>
       <main className="weather-container">
         <div>

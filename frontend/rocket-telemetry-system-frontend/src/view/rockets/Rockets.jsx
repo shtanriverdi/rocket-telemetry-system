@@ -34,7 +34,7 @@ export default function Rockets() {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log("data:", data);
+          // console.log("data:", data);
           setRocketsState(data);
         } else {
           throw new Error("Service unavailable");

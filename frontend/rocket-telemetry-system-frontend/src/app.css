@@ -41,6 +41,13 @@
   justify-content: center;
 }
 
+.asd{
+ background-color: rgb(239, 255, 239);
+ background-color: rgb(255, 233, 254);
+ background-color: rgb(255, 220, 213);
+ background-color: rgb(231, 231, 231);
+}
+
 .weather-container {
   display: flex;
   justify-content: center;

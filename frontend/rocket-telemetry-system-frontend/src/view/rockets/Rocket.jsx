@@ -180,15 +180,30 @@ export default function Rocket({ rocketData }) {
     }
   };
 
+  function getStatusColor(status) {
+    switch (status) {
+      case "launched":
+        return "rgb(239, 255, 239)";
+      case "deployed":
+        return "rgb(255, 233, 254)";
+      case "failed":
+        return "rgb(255, 220, 213)";
+      case "cancelled":
+        return "rgb(231, 231, 231)";
+    }
+  }
+
   return (
-    <div className="rocket-container ps">
+    <div
+      className="rocket-container ps"
+      style={{ backgroundColor: getStatusColor(status) }}>
       <div className="flex-container-outer">
         <div className="m-bs flex-container-centerize">
           <p>
-            <b>Connection:&nbsp;</b>
+            Connection:&nbsp;
           </p>
           <p
-            className="inline-block"
+            className="inline-block bold"
             style={{
               color:
                 isRocketConnected === 0
@@ -250,8 +265,9 @@ export default function Rocket({ rocketData }) {
       </div>
       <p className="m-t m-b">
         <b>Rocket Status:</b>{" "}
-        <span
+        <span className="bold"
           style={{
+            textTransform: "uppercase",
             color:
               status === "launched"
                 ? "green"
