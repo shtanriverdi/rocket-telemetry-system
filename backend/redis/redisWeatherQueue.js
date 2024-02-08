@@ -63,16 +63,10 @@ const enqueueWeatherData = async (data) => {
   }
 };
 
-// Removes and gets the first data in the weather queue
+// Gets the first data in the weather queue
 const dequeueWeatherData = async () => {
   try {
-    const data = await redis.lpop(weatherQueueName);
-    // // Update last recent data, deep copy
-    // lastRecentWeatherData = { ...data };
-    // console.log("Removed data from queue: ", data);
-    // console.log("Removed data from queue", data);
-    console.log("Removed data from queue");
-    // console.log("lastRecentWeatherData", lastRecentWeatherData, "\n");
+    const data = await redis.lindex(weatherQueueName, 0);
     return data ? JSON.parse(data) : lastRecentWeatherData;
   } catch (error) {
     console.log("error dequeue: ", error, "\n");

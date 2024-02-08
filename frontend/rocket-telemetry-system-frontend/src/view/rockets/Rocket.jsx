@@ -45,7 +45,7 @@ export default function Rocket({ rocketData }) {
       // Enabled the socket
       socket.connect();
     } else if (isRocketConnected === 2) {
-      socket.off("rocketData");
+      // socket.off("rocketData");
       socket.disconnect();
       setRocketConnected(0);
     }
@@ -55,13 +55,12 @@ export default function Rocket({ rocketData }) {
     socket.on("connect", () => {
       console.log("Socket.io connected for Rocket: ", id);
       setRocketConnected(2);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("On disconnect for Rocket: ", id);
-      socket.off("rocketData");
-      socket.disconnect();
-      setRocketConnected(0);
+      socket.on("disconnect", () => {
+        console.log("On disconnect for Rocket: ", id);
+        // socket.off("rocketData");
+        socket.disconnect();
+        setRocketConnected(0);
+      });
     });
 
     socket.on("rocketData", (data) => {
@@ -75,7 +74,7 @@ export default function Rocket({ rocketData }) {
       // socket.emit("leaveRoom", id);
       // Disconnects the socket manually. In that case, the socket will not try to reconnect.
       socket.disconnect();
-      socket.off("rocketData");
+      // socket.off("rocketData");
       setRocketConnected(0);
     });
   }, [isRocketConnected]);

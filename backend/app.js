@@ -100,8 +100,6 @@ weatherNamespace.on("connection", (socket) => {
     const redisWeatherJSON = await dequeueWeatherData();
     // Send the data to socket
     weatherNamespace.emit("weatherData", redisWeatherJSON);
-    // const { data: weatherData } = await getWeatherData();
-    // weatherNamespace.emit("weatherData", weatherData);
   }, 150);
 
   // Clear interval on disconnection
@@ -110,12 +108,6 @@ weatherNamespace.on("connection", (socket) => {
     clearInterval(weatherInterval);
   });
 });
-
-// weatherNamespace.on("terminate", function () {
-//   weatherNamespace.removeAllListeners("terminate");
-//   weatherNamespace.disconnectSockets();
-//   console.log("Weather namespace disconnected:", socket.id);
-// });
 
 // ------------------------ Rockets ------------------------
 
@@ -132,6 +124,10 @@ rockets.forEach((rocket) => {
   rocketNamespace.on("connection", (socket) => {
     console.log(`Socket.io connected for rocket: ${id}`);
   });
+
+  // rocketNamespace.on("disconnect", () => {
+  //   console.log("Rocket namespace disconnected:", id);
+  // });
 
   // Add the rocket ID to the rocketNamespace object for reference
   // rocketNamespace.rocketID = id;

@@ -178,7 +178,7 @@ const isDataValid = async (dataToBePushed, rocketID) => {
 const enqueueRocketData = async (data, rocketID) => {
   // console.log("rocketsQueueMap: ", rocketsQueueMap);
   const currentQueueLen = await redis.llen(rocketsQueueMap[rocketID]);
-  console.log(rocketID, "currentQueueLen: ", currentQueueLen);
+  // console.log(rocketID, "currentQueueLen: ", currentQueueLen);
   // Keep the length of the queue constant to prevent memory overflow. etc
   if (currentQueueLen >= MAX_QUEUE_LENGTH) {
     const poppedData = await redis.lpop(rocketsQueueMap[rocketID]);
@@ -195,9 +195,13 @@ const enqueueRocketData = async (data, rocketID) => {
 
 // Gets the first data in the weather queue
 const dequeueRocketData = async (rocketID) => {
-  const data = await redis.lindex(rocketsQueueMap[rocketID], 0);
-  // const data = await redis.lpop(rocketsQueueMap[rocketID]);
-  return data ? JSON.parse(data) : emptyData;
+  try {
+    const data = await redis.lindex(rocketsQueueMap[rocketID], 0);
+    // const data = await redis.lpop(rocketsQueueMap[rocketID]);
+    return data ? JSON.parse(data) : emptyData;
+  } catch (error) {
+    console.log("Error dequeueing rocket data", error);
+  }
 };
 
 // Retrieves all items in the given rocketID's queue
