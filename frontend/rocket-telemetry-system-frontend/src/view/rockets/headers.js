@@ -1,0 +1,10 @@
+const headers = new Headers();
+headers.append("x-api-key", "API_KEY_1");
+headers.append("Connection", "keepalive");
+headers.append("Accept-Encoding", "gzip, deflate, br");
+headers.append("Accept", "*/*");
+headers.append("User-Agent", "PostmanRuntime/7.36.1");
+headers.append("Content-Length", "0");
+headers.append("Postman-Token", "<calculated when request is sent>");
+
+export default headers;

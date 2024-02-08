@@ -3,14 +3,7 @@ import { useEffect, useState } from "react";
 
 const ROCKETS_URL = "http://localhost:3000";
 
-const headers = new Headers();
-headers.append("x-api-key", "API_KEY_1");
-headers.append("Connection", "keepalive");
-headers.append("Accept-Encoding", "gzip, deflate, br");
-headers.append("Accept", "*/*");
-headers.append("User-Agent", "PostmanRuntime/7.36.1");
-headers.append("Content-Length", "0");
-headers.append("Postman-Token", "<calculated when request is sent>");
+import headers from "./headers";
 
 const MAX_RETRY_COUNT = 10;
 const RETRY_INTERVAL_MS = 1000; // 1 second
@@ -20,18 +13,21 @@ export default function Rocket({ rocketData }) {
     autoConnect: false,
   });
 
+  // Telemetry Data
   const { host, port } = rocketData.telemetry;
-  const { id, model, mass, payload, status, timestamps } = rocketData;
-  const { altitude, speed, acceleration, thrust, temperature } = rocketData;
-
-  const [rocketState, setRocketState] = useState({
+  const {
     id,
     model,
     mass,
     payload,
+    altitude,
+    speed,
+    acceleration,
+    thrust,
+    temperature,
     status,
     timestamps,
-  });
+  } = rocketData;
 
   const [telemetryState, setTelemetryState] = useState({
     altitude,
@@ -47,6 +43,11 @@ export default function Rocket({ rocketData }) {
     if (isRocketConnected === 0) {
       setRocketConnected(1);
       socket.connect();
+      if (socket.connected) {
+        setRocketConnected(2);
+      } else {
+        setRocketConnected(0);
+      }
     } else if (isRocketConnected === 2) {
       socket.disconnect();
       setRocketConnected(0);
@@ -105,7 +106,7 @@ export default function Rocket({ rocketData }) {
           console.log("Rocket is already launched.");
         }
 
-        setRocketState((prevState) => ({ ...prevState, status: "launched" }));
+        // setRocketState((prevState) => ({ ...prevState, status: "launched" }));
       });
     } catch (error) {
       console.error("An error occurred while launching the rocket:", error);
@@ -128,7 +129,7 @@ export default function Rocket({ rocketData }) {
           console.log("Rocket is already deployed.");
         }
 
-        setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
+        // setRocketState((prevState) => ({ ...prevState, status: "deployed" }));
       });
     } catch (error) {
       console.error("An error occurred while deploying the rocket:", error);
@@ -151,7 +152,7 @@ export default function Rocket({ rocketData }) {
           console.log("Rocket is not yet launched.");
         }
 
-        setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
+        // setRocketState((prevState) => ({ ...prevState, status: "cancelled" }));
       });
     } catch (error) {
       console.error("An error occurred while canceling the rocket:", error);
@@ -220,10 +221,10 @@ export default function Rocket({ rocketData }) {
         </div>
         <div>
           <li className="bold underline">Timestamps</li>
-          <li>launched: {rocketState.timestamps.launched ?? "-"}</li>
-          <li>deployed: {rocketState.timestamps.deployed ?? "-"}</li>
-          <li>failed: {rocketState.timestamps.failed ?? "-"}</li>
-          <li>cancelled: {rocketState.timestamps.cancelled ?? "-"}</li>
+          <li>launched: {timestamps.launched ?? "-"}</li>
+          <li>deployed: {timestamps.deployed ?? "-"}</li>
+          <li>failed: {timestamps.failed ?? "-"}</li>
+          <li>cancelled: {timestamps.cancelled ?? "-"}</li>
         </div>
       </div>
       <p className="m-t m-b">
